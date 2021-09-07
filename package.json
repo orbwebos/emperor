@@ -1,0 +1,28 @@
+{
+  "name": "emperor",
+  "version": "0.0.0",
+  "description": "The Emperor Discord bot.",
+  "main": "index.js",
+  "scripts": {
+    "slash": "node slash-update.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Orbwebos",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/builders": "^0.6.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "discord-api-types": "^0.22.0",
+    "discord-together": "^1.1.62",
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0",
+    "node-schedule": "^2.0.0",
+    "sequelize": "^6.6.5",
+    "sqlite3": "^5.0.2",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.15.4",
+    "eslint": "^7.32.0"
+  }
+}
