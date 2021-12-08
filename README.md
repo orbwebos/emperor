@@ -2,5 +2,5 @@
 
 Emperor is a Discord bot. To run it:
 
-1. Run `npm i` command
-2. Run `npm start` command
+1. `npm i`
+2. `npm start`
