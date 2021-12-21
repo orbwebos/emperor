@@ -3,7 +3,10 @@ import { EmperorEvent } from '../util/emperor_event';
 // import { WordDetector } from '../util/word_detector';
 // import * as sport from '../util/sports_words';
 import * as config from '../../config.json';
+import * as schedule from 'node-schedule';
 import * as log from '../util/logging';
+import { StateManager } from '../util/state_manager';
+import { Sender } from '../util/sender_replier';
 import { emojiProcess } from '../util/emoji';
 import { addHours } from 'date-fns';
 import { sportsWordsProcess } from '../util/sports_words';
@@ -41,7 +44,7 @@ const executer = async (message, client) => {
 					await message.react('redactedId');
 					await repliedMessage.react('redactedId');
 					await message.react('redactedId');
-					await repliedmessage.react('redactedId');
+					await repliedMessage.react('redactedId');
 					await message.react('redactedId');
 				}
 				catch(e) {
