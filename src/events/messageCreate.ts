@@ -11,6 +11,7 @@ import { emojiProcess } from '../util/emoji';
 import { addHours } from 'date-fns';
 import { sportsWordsProcess } from '../util/sports_words';
 import Minesweeper from 'discord.js-minesweeper';
+import { Message } from 'discord.js';
 
 const minesweeperProcess = (m: any): void => {
 	if (m.content.toLowerCase().split(' ')[0] === '.minesweeper') return m.channel.send(new Minesweeper().start());
@@ -18,7 +19,7 @@ const minesweeperProcess = (m: any): void => {
 
 const name = 'messageCreate';
 const once = false;
-const executer = async (message, client) => {
+const executer = async (message: Message, client) => {
 	// if (!client.application?.owner) await client.application?.fetch();
 	if (message.author.bot) return;
 
