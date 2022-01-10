@@ -1,16 +1,16 @@
 {
    "name": "emperor",
-   "version": "4.0.0",
+   "version": "4.1.0",
    "description": "The Emperor Discord bot.",
    "main": "src/index.ts",
    "scripts": {
-      "start": "ts-node src/index.ts",
+      "start": "ts-node -r dotenv/config src/index.ts dotenv_config_path=config/.env",
       "slash": "ts-node slash_update.ts",
       "scratch": "ts-node scratch.ts",
       "test": "echo \"Error: no test specified\" && exit 1"
    },
    "author": "Orbwebos",
-   "license": "ISC",
+   "license": "MIT",
    "dependencies": {
       "@discordjs/builders": "^0.8.1",
       "@discordjs/rest": "^0.1.0-canary.0",

@@ -1,5 +1,4 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { EmperorEmbedder } from '../util/emperor_embedder';
 import { EmperorCommand } from '../util/emperor_command';
 import { Replier } from '../util/sender_replier';
 

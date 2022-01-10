@@ -1,16 +1,16 @@
 import { format } from 'date-fns';
 import chalk from 'chalk';
-import * as config from '../../config.json';
+import { ConfigManager } from './config_manager'; const config = new ConfigManager();
 
 function ownerReport(client: any, message: any): void {
-	client.users.fetch(config.ownerId)
+	client.users.fetch(config.bot.owner_id)
 	.then(owner => owner.send(`\`\`\`${message}\`\`\``))
 	.catch(e => console.error(e));
 }
 
 function writeToLogChannel(client: any, message: any) {
-	client.guilds.fetch(config.redacted2Id)
-	.then(guild => guild.channels.fetch(config.loggingChannel))
+	client.guilds.fetch(config.bot.logging_guild)
+	.then(guild => guild.channels.fetch(config.bot.logging_channel))
 	.then(channel => {
 		if (channel.type === 'GUILD_TEXT') {
 			// @ts-ignore: Property 'send' does not exist on type 'TextChannel'.
@@ -53,7 +53,7 @@ function getLevel(level: 'NOTIFY' | 'FATAL' | 'ERROR' | 'WARNING' | 'INFO' | 'DE
 }
 
 export function notify(client: any, message: any): void {
-	if (NOTIFY >= config.logLevel) {
+	if (NOTIFY >= config.bot.log_level) {
 		const date = getDate();
 		const level = getLevel('NOTIFY');
 		const messageString = `${date.string} ${level.string}: ${message}`
@@ -67,7 +67,7 @@ export function notify(client: any, message: any): void {
 }
 
 export function fatal(client: any, message: any): void {
-	if (FATAL >= config.logLevel) {
+	if (FATAL >= config.bot.log_level) {
 		const date = getDate();
 		const level = getLevel('FATAL');
 		const messageString = `${date.string} ${level.string}: ${message}`
@@ -81,7 +81,7 @@ export function fatal(client: any, message: any): void {
 }
 
 export function error(client: any, message: any): void {
-	if (ERROR >= config.logLevel) {
+	if (ERROR >= config.bot.log_level) {
 		const date = getDate();
 		const level = getLevel('ERROR');
 		const messageString = `${date.string} ${level.string}: ${message}`
@@ -94,7 +94,7 @@ export function error(client: any, message: any): void {
 }
 
 export function warn(client: any, message: any): void {
-	if (WARNING >= config.logLevel) {
+	if (WARNING >= config.bot.log_level) {
 		const date = getDate();
 		const level = getLevel('WARNING');
 		const messageString = `${date.string} ${level.string}: ${message}`
@@ -107,7 +107,7 @@ export function warn(client: any, message: any): void {
 }
 
 export function info(client: any, message: any): void {
-	if (INFO >= config.logLevel) {
+	if (INFO >= config.bot.log_level) {
 		const date = getDate();
 		const level = getLevel('INFO');
 		const messageString = `${date.string} ${level.string}: ${message}`
@@ -122,7 +122,7 @@ export function info(client: any, message: any): void {
 }
 
 export function debug(message: any): void {
-	if (DEBUG >= config.logLevel) {
+	if (DEBUG >= config.bot.log_level) {
 		const date = getDate();
 		const level = getLevel('DEBUG');
 

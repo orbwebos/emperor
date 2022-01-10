@@ -1,6 +1,6 @@
 import path from 'path';
-import * as config from '../../config.json';
+import * as config from '../../config/bot.json';
 
-export function resolvePath(inputPath: string): string {
-	return path.resolve(config.basePath, inputPath);
+export function resolvePathFromSource(inputPath: string): string {
+	return path.resolve(config.source_path, inputPath);
 }

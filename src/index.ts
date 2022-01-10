@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { Collection } from 'discord.js';
 import { EmperorClient } from './util/emperor_client';
-import * as config from '../config.json';
+import { ConfigManager } from './util/config_manager';
 
 const client = new EmperorClient();
 
@@ -26,10 +26,4 @@ for (const file of eventFiles) {
 	}
 }
 
-/*
-client.on("error", (e) => console.error(e));
-client.on("warn", (e) => console.warn(e));
-client.on("debug", (e) => console.info(e));
-*/
-
-client.login(config.token);
+client.login(new ConfigManager().secrets.botToken);

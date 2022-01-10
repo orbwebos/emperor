@@ -1,5 +1,5 @@
 import * as djs from 'discord.js';
-import * as config from '../../config.json';
+import { ConfigManager } from './config_manager'; const config = new ConfigManager();
 
 export class EmperorEmbedder {
 	username: string;
@@ -9,7 +9,7 @@ export class EmperorEmbedder {
 		if (typeof user === "string") {
 			this.username = user;
 			if (!avatarUser) {
-				throw new Error('No avatar URL received for Emperor embedder');
+				throw new Error(`No avatar URL received for ${config.bot.name} embedder`);
 			}
 			this.userAvatarUrl = avatarUser;
 		}
@@ -30,7 +30,7 @@ export class EmperorEmbedder {
 			.setAuthor(this.username, this.userAvatarUrl)
 			.setDescription(text)
 			.setTimestamp()
-			.setFooter(config.emperorVersion);
+			.setFooter(`${config.bot.name} v${config.bot.version}`);
 
 		return embed;
 	}
@@ -46,7 +46,7 @@ export class EmperorEmbedder {
 			.setAuthor(this.username, this.userAvatarUrl)
 			.setDescription(text)
 			.setTimestamp()
-			.setFooter(`Page ${currentPage}/${totalPages} | ${config.emperorVersion}`);
+			.setFooter(`Page ${currentPage}/${totalPages} | ${config.bot.name} v${config.bot.version}`);
 
 		return embed;
 	}
