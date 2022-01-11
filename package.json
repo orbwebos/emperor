@@ -1,12 +1,11 @@
 {
    "name": "emperor",
-   "version": "4.1.0",
+   "version": "5.0.0",
    "description": "The Emperor Discord bot.",
    "main": "src/index.ts",
    "scripts": {
       "start": "ts-node -r dotenv/config src/index.ts dotenv_config_path=config/.env",
-      "slash": "ts-node slash_update.ts",
-      "scratch": "ts-node scratch.ts",
+      "slash": "ts-node -r dotenv/config slash_update.ts dotenv_config_path=config/.env",
       "test": "echo \"Error: no test specified\" && exit 1"
    },
    "author": "Orbwebos",

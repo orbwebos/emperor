@@ -1,0 +1,10 @@
+{
+    "words": [],
+    "delete_trigger": false,
+    "reply": true,
+    "reply_title": "Word filter triggered",
+    "reply_content": "You seem to have triggered the word filter.",
+    "use_levenshtein": true,
+    "levenshtein_threshold": 1,
+    "levenshtein_lookahead": 3
+}

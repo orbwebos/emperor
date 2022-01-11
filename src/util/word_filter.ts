@@ -19,13 +19,14 @@ export async function wordFilterProcess(msg: any, threshold?: number, lookahead?
     return;
   }
   const wfConfig = new ConfigManager().wordFilter();
+  threshold = wfConfig.use_levenshtein ? threshold : 0;
   const resp = levenshteinMatches(wfConfig.words, msg.content.toLowerCase(), threshold, lookahead, [], [replaceHyphens, replaceUnderscores, replaceSpaces, removeWhitespace]);
   if (resp.matched) {
     log.debug(`Matched.\nReference:\n    Used: "${resp.reference.used}"\n    Original: "${resp.reference.original}"\nInput:\n    Used: "${resp.input.used}"\n    Original: "${resp.input.original}"`);
     if (wfConfig.reply === true) {
       const embedder = new EmperorEmbedder(msg.author);
       const embed = embedder.emperorEmbed(wfConfig.reply_title, wfConfig.reply_content);
-      msg.reply({ embeds: [embed] });
+      await msg.reply({ embeds: [embed] });
     }
     if (wfConfig.delete_trigger === true) {
       try {

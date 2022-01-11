@@ -1,11 +1,11 @@
-import { addHours } from "date-fns";
-import Minesweeper from "discord.js-minesweeper";
-import { ConfigManager } from "../util/config_manager"; const config = new ConfigManager();
-import { emojiProcess } from "../util/emoji";
-import { EmperorEmbedder } from "../util/emperor_embedder";
-import { EmperorEvent } from "../util/emperor_event";
+import { addHours } from 'date-fns';
+import Minesweeper from 'discord.js-minesweeper';
+import { ConfigManager } from '../util/config_manager'; const config = new ConfigManager();
+import { emojiProcess } from '../util/emoji';
+import { EmperorEmbedder } from '../util/emperor_embedder';
+import { EmperorEvent } from '../util/emperor_event';
 import * as log from '../util/logging';
-import { wordFilterProcess } from "../util/word_filter";
+import { wordFilterProcess } from '../util/word_filter';
 
 const name = 'messageCreate';
 const once = false;
@@ -15,7 +15,7 @@ const executer = async (message, client) => {
   try {
     if (message.content.toLowerCase().split(' ')[0] === '.minesweeper') return message.channel.send(new Minesweeper().start());
     emojiProcess(message);
-    if (config.general.word_filter_guilds_whitelist.includes(message.guildId) === true && config.general.word_filter_channels_blacklist.includes(message.channelId) === false) await wordFilterProcess(message, config.general.word_filter_levenshtein_threshold, config.general.word_filter_levenshtein_lookahead);
+    if (config.general.word_filter_guilds_whitelist.includes(message.guildId) === true && config.general.word_filter_channels_blacklist.includes(message.channelId) === false) await wordFilterProcess(message, config.wordFilter().levenshtein_threshold, config.wordFilter().levenshtein_lookahead);
   }
   catch(e) {
     log.warn(message.client, e);
@@ -26,17 +26,15 @@ const executer = async (message, client) => {
       const channel = await client.channels.fetch(message.channelId);
       const repliedMessage = await channel.messages.fetch(message.reference.messageId);
 
-      if (message.content.toLowerCase().includes('ratio') && config.general.ratio === true && config.general.ratio_guilds_blacklist.includes(message.guildId) === false) {
+      if (message.content.toLowerCase().includes(config.general.emoji_reaction_trigger_word) && config.general.emoji_reaction === true && config.general.emoji_reaction_guilds_whitelist.includes(message.guildId) === true) {
         try {
-          await repliedMessage.react('redactedId');
-          await message.react('redactedId');
-          await repliedMessage.react('redactedId');
-          await message.react('redactedId');
-          await repliedmessage.react('redactedId');
-          await message.react('redactedId');
+          for (const emoji of config.general.emoji_reaction_resolvables) {
+            await repliedMessage.react(emoji);
+            await message.react(emoji);
+          }
         }
         catch(e) {
-          log.error(message.client, `Failure in "ratio" directive: ${e}`);
+          log.error(message.client, `Failure in "emoji reaction" directive: ${e}`);
         }
       }
       if (message.content.toLowerCase().startsWith('.carbomb') && config.general.carbombs === true && config.general.carbombs_guilds_whitelist.includes(message.guildId) === true) {

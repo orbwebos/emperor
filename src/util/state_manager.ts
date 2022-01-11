@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { resolvePathFromSource } from "./resolve_path";
+import { resolvePathFromSource } from './resolve_path';
 
 export class StateManager {
   public readonly path: string;

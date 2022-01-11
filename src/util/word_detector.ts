@@ -1,16 +1,16 @@
 export class WordDetector {
-	words: string[]
+  words: string[]
 
-	constructor(words: string[]) {
-		this.words = words;
-	}
+  constructor(words: string[]) {
+    this.words = words;
+  }
 
-	detectsWords(input: string): boolean {
-		for (const i in this.words) {
-			if (input.includes(this.words[i])) {
-				return true;
-			}
-		}
-		return false;
-	}
+  detectsWords(input: string): boolean {
+    for (const i in this.words) {
+      if (input.includes(this.words[i])) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

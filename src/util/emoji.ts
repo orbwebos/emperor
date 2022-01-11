@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { ConfigManager } from "../util/config_manager"; const config = new ConfigManager();
+import { ConfigManager } from '../util/config_manager'; const config = new ConfigManager();
 import * as log from '../util/logging';
 
 const regex = /(?<!<|<a|\\):\w\w+:/gi;
@@ -48,12 +48,12 @@ export async function emojiProcess(msg: Message): Promise<void> {
         // @ts-ignore: fetchWebhooks does not exist on type 'TextChannel'.
         const webhooks = await channel.fetchWebhooks();
 
-        let webhook = await webhooks.find(webhook => webhook.name === 'Emperor Emoji Service');
+        let webhook = await webhooks.find(webhook => webhook.name === `${config.bot.name} Emoji Service`);
         if (!webhook) {
-          log.debug(`Creating new Emperor Emoji Service webhook in ${channel.id}...`);
+          log.debug(`Creating new ${config.bot.name} Emoji Service webhook in ${channel.id}...`);
           // @ts-ignore: createWebhook does not exist on type 'TextChannel'.
-          webhook = await channel.createWebhook('Emperor Emoji Service', {
-            avatar: 'https://cdn.discordapp.com/avatars/874016607767257129/1aa6ba7e91dc379e144d99df0d488529.png?size=1024',
+          webhook = await channel.createWebhook(`${config.bot.name} Emoji Service`, {
+            avatar: config.general.emoji_service_webhook_avatar_url,
           });
         }
 
@@ -69,7 +69,7 @@ export async function emojiProcess(msg: Message): Promise<void> {
           content: msg.content,
           username: name,
           avatarURL: msg.author.displayAvatarURL({ dynamic: true }),
-        })
+        });
       }
     }
   }
