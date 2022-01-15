@@ -1,5 +1,5 @@
 import { REST } from '@discordjs/rest';
-import { ConfigManager } from './src/util/config_manager';
+import { ConfigManager } from '../src/util/config_manager';
 import * as fs from 'fs';
 
 const commands = [];
@@ -7,7 +7,7 @@ const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWi
 
 const config = new ConfigManager();
 
-const GUILD_ID = '605428940537987083';  // change this to the ID of the guild you want to register to
+const GUILD_ID = '123456789012345678';  // change this to the ID of the guild you want to register to
 
 for (const file of commandFiles) {
   const cmd = require(`./src/commands/${file}`);

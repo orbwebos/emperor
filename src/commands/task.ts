@@ -305,12 +305,12 @@ const cmdData = new SlashCommandBuilder()
         option.setName('removing-requires-options')
           .setDescription('Whether removing tasks requires options. Default: true.')));
 
-const cmdExecuter = async interaction => {
+const cmdExecuter = async i => {
   try {
-    const taskDiscCtx = await createTaskDiscordContext(new Replier(interaction, '#ffa500'));
+    const taskDiscCtx = await createTaskDiscordContext(new Replier(i, '#ffa500'));
 
     try {
-      switch (interaction.options.getSubcommand()) {
+      switch (i.options.getSubcommand()) {
         case 'add': {
           const task = await taskDiscCtx.addTaskFromContext();
           return await taskDiscCtx.reply(taskDiscCtx.title.response, `The following task was successfully created:\n\n${taskDiscCtx.format([task], null, 'none')}`);
@@ -425,7 +425,7 @@ const cmdExecuter = async interaction => {
         }
         default: {
           await taskDiscCtx.reply(taskDiscCtx.title.stateError, 'This incident will be reported.')
-          log.notify(interaction.client, `State error in interaction with command ${interaction.commandName}: subcommand ${interaction.options.getSubcommand()}`);
+          log.notify(i.client, `State error in interaction with command ${i.commandName}: subcommand ${i.options.getSubcommand()}`);
         }
       }
     }
@@ -441,11 +441,11 @@ const cmdExecuter = async interaction => {
     if (e.toString().includes('user isn\'t registered. halt everything')) {
       return;
     }
-    if (interaction.deferred || interaction.replied) {
-      await interaction.editReply({ content: `**${e.toString()}**` });
+    if (i.deferred || i.replied) {
+      await i.editReply({ content: `**${e.toString()}**` });
     }
     else {
-      await interaction.reply({ content: `**${e.toString()}**`, ephemeral: true });
+      await i.reply({ content: `**${e.toString()}**`, ephemeral: true });
     }
     log.debug(e);
   }

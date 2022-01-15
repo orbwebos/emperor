@@ -23,7 +23,7 @@ const cmdExecuter = async i => {
     .replace(/_/g, '')
     .replace(/~~/g, '')
     .replace(/>\ /g, '>'), 130);
-  const invisible: boolean = i.options.getBoolean('invisible') ? true : false; 
+  const invisible: boolean = i.options.getBoolean('invisible') ? true : false;
   const title = new EmperorTitle(i);
   const replier = new Replier(i);
 

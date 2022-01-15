@@ -1,7 +1,7 @@
 import { StateManager } from './state_manager';
 
 export type Secrets = {
-	botToken: string;
+  botToken: string;
 }
 
 export class ConfigManager {

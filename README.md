@@ -5,26 +5,24 @@ it to be complete, and will not add any further features.
 
 ## Running
 
-To run it, first create an `.env` file in the project's root containing a
-key-value pair for your instance's bot token, like so:
-
 ```
-BOT_TOKEN=YOUR_TOKEN
+cp -r examples/config config
 ```
 
-Then, fill the relevant fields in the `config/bot.json` file. Finally:
+Modify the `.env` file in the configuration folder so that it contains your
+actual bot's token. Then, fill the relevant fields in the `config/bot.json`
+file. I suggest you also look into the other files in the folder. Finally:
 
-1. `npm i`
-2. `npm start`
-
-You *might* need to manually download the relevant TypeScript utilities. It's a
-good idea to check out the other files in the `config` directory.
+```
+npm i
+npm start
+```
 
 ## Slash commands
 
-To use Emperor, you'll need to register its slash commands. `slash_update.ts` is
-an example script that registers the commands on a single guild. Registering
-them globally is probably preferable.
+To use Emperor, you'll need to register its slash commands.
+`examples/slash_update.ts` is an example script that registers the commands on a
+single guild. Registering them globally is probably preferable.
 
 ## About Tasks
 

@@ -1,24 +1,30 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { DiscordTogether } from 'discord-together';
-import { EmperorEmbedder } from '../util/emperor_embedder';
 import { EmperorCommand } from '../util/emperor_command';
+import { ConfigManager } from '../util/config_manager';
+import { Replier } from '../util/sender_replier';
+import { EmperorTitle } from '../util/emperor_title';
 
 const cmdData = new SlashCommandBuilder()
   .setName('youtube')
-  .setDescription('Replies with an invite link to a YouTube Together activity.');
+  .setDescription('Replies with an invite link to a YouTube Together activity.')
+  .addBooleanOption(option =>
+    option.setName('invisible')
+      .setDescription(`If true, only you will see ${new ConfigManager().bot.name_possessive} response. Default: false.`));
 
-const cmdExecuter = async interaction => {
-  interaction.client.discordTogether = new DiscordTogether(interaction.client);
-  const embedder = new EmperorEmbedder(interaction.user);
-  if (interaction.member.voice.channel) {
-    interaction.client.discordTogether.createTogetherCode(interaction.member.voice.channel.id, 'youtube').then(async invite => {
-      const embed = embedder.emperorEmbed('YouTube Together response', `[Click here.](${invite.code})`);
-      return interaction.reply({ embeds: [embed] });
+const cmdExecuter = async i => {
+  const invisible: boolean = i.options.getBoolean('invisible') ? true : false;
+  const title = new EmperorTitle(i);
+  const replier = new Replier(i);
+
+  i.client.discordTogether = new DiscordTogether(i.client);
+  if (i.member.voice.channel) {
+    i.client.discordTogether.createTogetherCode(i.member.voice.channel.id, 'youtube').then(async invite => {
+      return replier.reply(title.response, `[Click here.](${invite.code})`, invisible);
     });
   }
   else {
-    const embed = embedder.emperorEmbed('YouTube Together error', 'You need to be in a voice channel for that.');
-    return interaction.reply({ embeds: [embed], ephemeral: true });
+    return replier.reply(title.error, 'You need to be in a voice channel for that.', true);
   }
 };
 

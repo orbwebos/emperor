@@ -13,7 +13,7 @@ const cmdData = new SlashCommandBuilder()
       .setDescription(`If true, only you will see ${new ConfigManager().bot.name_possessive} response. Default: false.`));
 
 const cmdExecuter = async i => {
-  const invisible: boolean = i.options.getBoolean('invisible') ? true : false; 
+  const invisible: boolean = i.options.getBoolean('invisible') ? true : false;
   const title = new EmperorTitle(i);
   const replier = new Replier(i);
 

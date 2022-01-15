@@ -4,7 +4,7 @@
     "id": "123456789012345678",
     "log_level": 20,
     "source_path": "/absolute/path/to/emperor/src",
-    "version": "5.0.0",
+    "version": "5.1.0",
     "owner_id": "123456789012345678",
     "logging_guild": "123456789012345678",
     "logging_channel": "123456789012345678"
