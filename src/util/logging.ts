@@ -56,7 +56,7 @@ export function notify(client: any, message: any): void {
   if (NOTIFY >= config.bot.log_level) {
     const date = getDate();
     const level = getLevel('NOTIFY');
-    const messageString = `${date.string} ${level.string}: ${message}`
+    const messageString = `${date.string} ${level.string}: ${message}`;
 
     process.stdout.write(`${date.color} ${level.color}: `);
     console.log(message);
@@ -70,7 +70,7 @@ export function fatal(client: any, message: any): void {
   if (FATAL >= config.bot.log_level) {
     const date = getDate();
     const level = getLevel('FATAL');
-    const messageString = `${date.string} ${level.string}: ${message}`
+    const messageString = `${date.string} ${level.string}: ${message}`;
 
     process.stderr.write(`${date.color} ${level.color}: `);
     console.error(message);
@@ -84,7 +84,7 @@ export function error(client: any, message: any): void {
   if (ERROR >= config.bot.log_level) {
     const date = getDate();
     const level = getLevel('ERROR');
-    const messageString = `${date.string} ${level.string}: ${message}`
+    const messageString = `${date.string} ${level.string}: ${message}`;
 
     process.stderr.write(`${date.color} ${level.color}: `);
     console.error(message);
@@ -97,7 +97,7 @@ export function warn(client: any, message: any): void {
   if (WARNING >= config.bot.log_level) {
     const date = getDate();
     const level = getLevel('WARNING');
-    const messageString = `${date.string} ${level.string}: ${message}`
+    const messageString = `${date.string} ${level.string}: ${message}`;
 
     process.stderr.write(`${date.color} ${level.color}: `);
     console.warn(message);
@@ -110,7 +110,7 @@ export function info(client: any, message: any): void {
   if (INFO >= config.bot.log_level) {
     const date = getDate();
     const level = getLevel('INFO');
-    const messageString = `${date.string} ${level.string}: ${message}`
+    const messageString = `${date.string} ${level.string}: ${message}`;
 
     process.stdout.write(`${date.color} ${level.color}: `);
     console.info(message);

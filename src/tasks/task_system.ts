@@ -90,7 +90,7 @@ class TaskSystem {
  */
 export async function getTaskSystem(): Promise<TaskSystem> {
   //@ts-ignore Argument of type '{ recursive: boolean; }' is not assignable to parameter of type 'string | number'.
-  fs.mkdirSync(resolvePathFromSource('../data/tasks'), { recursive: true })
+  fs.mkdirSync(resolvePathFromSource('../data/tasks'), { recursive: true });
   const taskSystem = new TaskSystem();
   return await taskSystem.init();
 }

@@ -14,13 +14,13 @@ const cmdData = new SlashCommandBuilder()
 const cmdExecuter = async i => {
   const invisible: boolean = i.options.getBoolean('invisible') ? true : false; 
   const title = new EmperorTitle(i);
-  const replier = new Replier(i)
+  const replier = new Replier(i);
 
   const cmdReply = `**Server name:** ${i.guild.name}\n` +
     `**Total members:** ${i.guild.memberCount}\n` +
     `**Server was created in:** ${i.guild.createdAt}\n`;
 
-  return replier.reply(title.response, cmdReply, invisible)
+  return replier.reply(title.response, cmdReply, invisible);
 };
 
 export const cmd = new EmperorCommand(cmdData, cmdExecuter);

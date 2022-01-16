@@ -27,7 +27,7 @@ const cmdExecuter = async i => {
     `**Websocket heartbeat:** \`${i.client.ws.ping}\`ms\n` +
     `**Roundtrip latency**: \`${message.createdTimestamp - i.createdTimestamp}\`ms`);
 
-  return await message.edit({ embeds: [embedFinal] });
+  return i.editReply({ embeds: [embedFinal] });
 };
 
 export const cmd = new EmperorCommand(cmdData, cmdExecuter);

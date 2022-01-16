@@ -17,7 +17,7 @@ export function resolveTimeZone(inputTimeZone: string): string {
     return results[0].item;
   }
   else {
-    throw new Error('No timezone matched the provided string')
+    throw new Error('No timezone matched the provided string');
   }
 }
 

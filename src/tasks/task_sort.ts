@@ -29,7 +29,7 @@ import { Task } from './task';
       }
     }
     else {
-      throw new Error('invalid task array for sorting')
+      throw new Error('invalid task array for sorting');
     }
   }
 

@@ -387,7 +387,7 @@ const cmdExecuter = async i => {
           let toPost: string = '';
           let i: number = 0;
           if (resp.map.size) {
-            const p = plural(resp.map)
+            const p = plural(resp.map);
             resp.map.forEach((value: {original: string, modified: string }, field: string) => {
               if (resp.optionsPassed === false) {
                 if (i === 0) {
@@ -417,14 +417,14 @@ const cmdExecuter = async i => {
                 i++;
               }
             });
-            return await taskDiscCtx.reply(taskDiscCtx.title.response, toPost)
+            return await taskDiscCtx.reply(taskDiscCtx.title.response, toPost);
           }
           else {
-            return await taskDiscCtx.reply(taskDiscCtx.title.response, 'No value has been modified.')
+            return await taskDiscCtx.reply(taskDiscCtx.title.response, 'No value has been modified.');
           }
         }
         default: {
-          await taskDiscCtx.reply(taskDiscCtx.title.stateError, 'This incident will be reported.')
+          await taskDiscCtx.reply(taskDiscCtx.title.stateError, 'This incident will be reported.');
           log.notify(i.client, `State error in interaction with command ${i.commandName}: subcommand ${i.options.getSubcommand()}`);
         }
       }

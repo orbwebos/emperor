@@ -15,10 +15,10 @@ function emojiMatches(content: string): RegExpMatchArray {
 function emojiToText(emoji: any): string {
   let targetString: string = '<';
   if (emoji.animated) {
-    targetString += 'a:'
+    targetString += 'a:';
   }
   else {
-    targetString += ':'
+    targetString += ':';
   }
   targetString += `${emoji.name}:`;
   targetString += emoji.id;

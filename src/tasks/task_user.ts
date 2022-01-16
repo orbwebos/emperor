@@ -7,7 +7,7 @@ import { BaseTaskUser } from './base_task_user';
 import * as thelp from './helpers';
 import { Task } from './task';
 import _ from 'lodash';
-import Fuse from 'fuse.js'
+import Fuse from 'fuse.js';
 import { JsonTask } from './task';
 import { isNullOrUndefined } from 'util';
 import { TaskCreationParameters, TaskEditParameters, TaskSearchOptions } from './interfaces';
@@ -51,7 +51,7 @@ export class TaskUser extends BaseTaskUser {
       const files = fs.readdirSync(resolvePathFromSource(`../data/tasks/${this.id}/${contexts[i]}`));
       for (const ix in files) {
         const path = `../data/tasks/${this.id}/${contexts[i]}/${files[ix]}`;
-        const returnedValue = func(path, param)
+        const returnedValue = func(path, param);
         if (returnedValue === true) {
           return path;
         }
@@ -168,7 +168,7 @@ export class TaskUser extends BaseTaskUser {
     const taskObjects = await this.allTaskObjects();
     for (const i in taskObjects) {
       const task = this.taskFromObject(taskObjects[i]);
-      tasks.push(task)
+      tasks.push(task);
     }
 
     return tasks;
@@ -234,16 +234,16 @@ export class TaskUser extends BaseTaskUser {
       resultsJunction = resultsJunction.filter(task => task.context.code === filters.contextCode);
     }
     if (!isNullOrUndefined(filters.date)) {
-      resultsJunction = resultsJunction.filter(task => !isNullOrUndefined(task.dates.string) && task.dates.string.includes(filters.date))
+      resultsJunction = resultsJunction.filter(task => !isNullOrUndefined(task.dates.string) && task.dates.string.includes(filters.date));
     }
     if (!isNullOrUndefined(filters.deadline)) {
-      resultsJunction = resultsJunction.filter(task => !isNullOrUndefined(task.dates.deadline.string) && task.dates.deadline.string.includes(filters.deadline))
+      resultsJunction = resultsJunction.filter(task => !isNullOrUndefined(task.dates.deadline.string) && task.dates.deadline.string.includes(filters.deadline));
     }
     if (!isNullOrUndefined(filters.asleep)) {
       resultsJunction = resultsJunction.filter(task => task.dormant === filters.asleep);
     }
     if (!isNullOrUndefined(filters.wakeIn)) {
-      resultsJunction = resultsJunction.filter(task => !isNullOrUndefined(task.dates.wake.string) && task.dates.wake.string.includes(filters.wakeIn))
+      resultsJunction = resultsJunction.filter(task => !isNullOrUndefined(task.dates.wake.string) && task.dates.wake.string.includes(filters.wakeIn));
     }
     if (!isNullOrUndefined(filters.late)) {
       resultsJunction = resultsJunction.filter(task => task.late === filters.late);
@@ -256,7 +256,7 @@ export class TaskUser extends BaseTaskUser {
   }
 
   async edit(o: TaskEditParameters): Promise<{ original: Task, modified: Task }> {
-    const t = await this.taskById(o.id)
+    const t = await this.taskById(o.id);
     const original = t;
 
     const task = new Task({

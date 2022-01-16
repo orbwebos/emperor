@@ -104,7 +104,7 @@ class TaskDiscordContext {
                 await j.delete();
               }
               catch(e) {
-                log.debug(`Couldn't delete message ${j.id}: ${e}.`)
+                log.debug(`Couldn't delete message ${j.id}: ${e}.`);
               }
               const collector3 = await this.replier.interaction.channel.createMessageComponentCollector({ buttonFilter3, time: 300000 });
               let tz: string = '';
@@ -219,7 +219,7 @@ class TaskDiscordContext {
         const t = tasks[i];
 
         if (parseInt(i) === 0) {
-          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`
+          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
         }
 
         if (t.trash.isIn) {
@@ -270,7 +270,7 @@ class TaskDiscordContext {
           toReturn += `**Will be permanently removed <t:${timestamp.toString()}:R>**\n`;
         }
 
-        toReturn += '**ID:** `'
+        toReturn += '**ID:** `';
 
         if (t.customId) {
           toReturn += t.customId + '`';
@@ -297,7 +297,7 @@ class TaskDiscordContext {
         const t = tasks[i];
 
         if (parseInt(i) === 0) {
-          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`
+          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
         }
 
         if (t.trash.isIn) {
@@ -348,8 +348,8 @@ class TaskDiscordContext {
           toReturn += `With deadline <t:${timestamp.toString()}:F>\n`;
           toReturn += `**Remind days before:** ${t.dates.deadline.daysBefore}\n`;
           toReturn += `**Interval:** ${t.dates.deadline.interval} horas\n`;
-          toReturn += `***Offset*:** ${t.dates.deadline.offset} horas\n`
-          toReturn += `**Remind days later:** ${t.dates.deadline.daysRemindAfter}\n`
+          toReturn += `**Offset:** ${t.dates.deadline.offset} horas\n`;
+          toReturn += `**Remind days later:** ${t.dates.deadline.daysRemindAfter}\n`;
         }
 
         if (t.trash.isIn && t.trash.dateAdded) {
@@ -362,7 +362,7 @@ class TaskDiscordContext {
           toReturn += `**Will be permanently removed <t:${timestamp.toString()}:R>**\n`;
         }
 
-        toReturn += '**ID:** `'
+        toReturn += '**ID:** `';
 
         if (t.customId) {
           toReturn += t.customId + '`';
@@ -389,10 +389,10 @@ class TaskDiscordContext {
         const t = tasks[i];
 
         if (parseInt(i) === 0) {
-          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`
+          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
         }
         else if (parseInt(i) !== 0 && tasks[(parseInt(i) - 1).toString()].context.code !== t.context.code) {
-          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`
+          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
         }
 
         if (t.trash.isIn) {
@@ -443,7 +443,7 @@ class TaskDiscordContext {
           toReturn += `**Will be permanently removed <t:${timestamp.toString()}:R>**\n`;
         }
 
-        toReturn += '**ID:** `'
+        toReturn += '**ID:** `';
 
         if (t.customId) {
           toReturn += t.customId + '`';
@@ -470,10 +470,10 @@ class TaskDiscordContext {
         const t = tasks[i];
 
         if (parseInt(i) === 0) {
-          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`
+          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
         }
         else if (parseInt(i) !== 0 && tasks[(parseInt(i) - 1).toString()].context.code !== t.context.code) {
-          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`
+          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
         }
 
         if (t.trash.isIn) {
@@ -524,8 +524,8 @@ class TaskDiscordContext {
           toReturn += `With deadline <t:${timestamp.toString()}:F>\n`;
           toReturn += `**Remind days before:** ${t.dates.deadline.daysBefore}\n`;
           toReturn += `**Interval:** ${t.dates.deadline.interval} horas\n`;
-          toReturn += `***Offset*:** ${t.dates.deadline.offset} horas\n`
-          toReturn += `**Remind days later:** ${t.dates.deadline.daysRemindAfter}\n`
+          toReturn += `**Offset:** ${t.dates.deadline.offset} horas\n`;
+          toReturn += `**Remind days later:** ${t.dates.deadline.daysRemindAfter}\n`;
         }
 
         if (t.trash.isIn && t.trash.dateAdded) {
@@ -538,7 +538,7 @@ class TaskDiscordContext {
           toReturn += `**Will be permanently removed <t:${timestamp.toString()}:R>**\n`;
         }
 
-        toReturn += '**ID:** `'
+        toReturn += '**ID:** `';
 
         if (t.customId) {
           toReturn += t.customId + '`';
@@ -637,9 +637,9 @@ class TaskDiscordContext {
         this.taskDiscordHelper = new TaskDiscordHelper(this.initialInteraction.user.id);
       }
       else {
-        throw new Error('user isn\'t registered. halt everything')
+        throw new Error('user isn\'t registered. halt everything');
       }
-      this.retorter = new Retorter(retorterInfo, '\n\n', 1250)
+      this.retorter = new Retorter(retorterInfo, '\n\n', 1250);
     }
     catch(e) {
       switch (e.message) {

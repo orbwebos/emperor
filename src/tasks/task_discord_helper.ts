@@ -21,10 +21,10 @@ export class TaskDiscordHelper extends TaskUser {
         const t = tasks[i];
 
         if (parseInt(i) === 0) {
-          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`
+          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
         }
         else if (parseInt(i) !== 0 && tasks[(parseInt(i) - 1).toString()].context.code !== t.context.code) {
-          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`
+          toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
         }
 
         if (t.trash.isIn) {
@@ -75,7 +75,7 @@ export class TaskDiscordHelper extends TaskUser {
           toReturn += `**Will be permanently removed <t:${timestamp.toString()}:R>**\n`;
         }
 
-        toReturn += '**ID:** `'
+        toReturn += '**ID:** `';
 
         if (t.customId) {
           toReturn += t.customId + '`';
@@ -96,7 +96,7 @@ export class TaskDiscordHelper extends TaskUser {
   }
 
   public dm(client: any, task: Task, stage: number): void {
-    const timestamp = `<t:${Math.floor(task.dates.deadline.date.getTime() / 1000).toString()}:R>`
+    const timestamp = `<t:${Math.floor(task.dates.deadline.date.getTime() / 1000).toString()}:R>`;
 
     let title: string = '';
     let toSend: string = '';
@@ -117,7 +117,7 @@ export class TaskDiscordHelper extends TaskUser {
     }
 
     const embedder = new EmperorEmbedder('Tasks module', new ConfigManager().general.tasks_module_picture);
-    const embed = embedder.emperorEmbed(title, toSend, '#ffa500')
+    const embed = embedder.emperorEmbed(title, toSend, '#ffa500');
     client.users.fetch(task.user.id)
     .then(owner => owner.send({ embeds: [embed] }))
     .catch(e => console.error(e));
@@ -247,7 +247,7 @@ export class TaskDiscordHelper extends TaskUser {
     const deadlineReminderInterval: number = i.options.getInteger('deadline-reminder-interval');
     const deadlineReminderOffset: number = i.options.getInteger('deadline-reminder-offset');
     const deadlineKeepRemindingFor: number = i.options.getInteger('keep-reminding-for');
-    const wakeIn: string = i.options.getString('despertar-en')
+    const wakeIn: string = i.options.getString('despertar-en');
 
     const task = await this.addTask({
       title: title,

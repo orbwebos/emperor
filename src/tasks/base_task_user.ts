@@ -33,7 +33,7 @@ export class BaseTaskUser {
       .then(async response => {
         if (response.includes('Wrote to')) {
           for (const i in contexts) {
-            const folderPath = `../data/tasks/${this.id}/${contexts[i]}`
+            const folderPath = `../data/tasks/${this.id}/${contexts[i]}`;
             let doesIt: boolean;
             try {
               doesIt = await fileExists(folderPath);
@@ -44,7 +44,7 @@ export class BaseTaskUser {
     
             if (!doesIt) {
               try {
-                fs.mkdirSync(resolvePathFromSource(`../data/tasks/${this.id}/${contexts[i]}`))
+                fs.mkdirSync(resolvePathFromSource(`../data/tasks/${this.id}/${contexts[i]}`));
               }
               catch(e) {
                 reject(e);

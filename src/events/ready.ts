@@ -12,7 +12,7 @@ const executer = async client => {
   catch(e) {
     log.warn(client, e);
   }
-  log.notify(client, `Ready. Logged in as ${client.user.tag}`)
+  log.notify(client, `Ready. Logged in as ${client.user.tag}`);
 };
 
 export const event = new EmperorEvent(name, once, executer);

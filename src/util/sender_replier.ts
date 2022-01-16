@@ -30,8 +30,8 @@ export class Sender extends EmperorEmbedder {
   }
 
   sendAdvanced(userName: string, userAvatarUrl: string, title: string, body: string, contentPayload?: string): void {
-    const embedder = new EmperorEmbedder(userName, userAvatarUrl)
-    const embed = embedder.emperorEmbed(title, body, this.color)
+    const embedder = new EmperorEmbedder(userName, userAvatarUrl);
+    const embed = embedder.emperorEmbed(title, body, this.color);
     if (contentPayload && contentPayload !== '') {
       this.channel.send({ embeds: [embed], content: contentPayload });
     }
@@ -271,7 +271,7 @@ export class Retorter extends ExtendedReplier {
             await j.delete();
           }
           catch(e) {
-            log.debug(`Couldn't delete message ${j.id}: ${e}.`)
+            log.debug(`Couldn't delete message ${j.id}: ${e}.`);
           }
 
           const n = parseInt(j.content);
