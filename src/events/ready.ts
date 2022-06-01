@@ -1,18 +1,33 @@
-import { EmperorEvent } from '../util/emperor_event';
-import * as log from '../util/logging';
+import * as schedule from 'node-schedule';
 import { getTaskSystem } from '../tasks/task_system';
+import { EmperorEvent } from '../emperor/event';
+import { EmperorClient } from '../emperor/client';
+import * as log from '../util/logging';
 
-const name = 'ready';
-const once = true;
-const executer = async client => {
-  try {
-    const taskSystem = await getTaskSystem();
-    await taskSystem.loadDates(client);
+export default class ReadyEvent extends EmperorEvent {
+  constructor() {
+    super('ready', true);
   }
-  catch(e) {
-    log.warn(client, e);
-  }
-  log.notify(client, `Ready. Logged in as ${client.user.tag}`);
-};
 
-export const event = new EmperorEvent(name, once, executer);
+  static async execute(client: EmperorClient) {
+    try {
+      const taskSystem = await getTaskSystem(); // problematic statement
+      await taskSystem.loadDates(client);
+    } catch (e) {
+      if (e.message.includes('No tasks found')) {
+        log.debug(e);
+      } else {
+        log.warn(client, e);
+      }
+    }
+
+    client.emojiStore.setup(client);
+    log.debug('The emoji cache has been built.');
+    schedule.scheduleJob('*/30 * * * *', async () => {
+      await client.emojiStore.refresh();
+      log.debug('The emoji cache has been refreshed.');
+    });
+
+    log.notify(client, `Ready. Logged in as ${client.user.tag}`);
+  }
+}

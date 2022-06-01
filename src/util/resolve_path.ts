@@ -1,6 +1,5 @@
-import path from 'path';
-import * as config from '../../config/bot.json';
+import * as path from 'path';
 
 export function resolvePathFromSource(inputPath: string): string {
-  return path.resolve(config.source_path, inputPath);
+  return path.join(__dirname, '..', inputPath);
 }

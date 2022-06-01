@@ -1,7 +1,7 @@
 # Emperor
 
-Emperor is a Discord bot. It's an amateurish exercise in programming. I consider
-it to be complete, and will not add any further features. 
+Emperor is a Discord bot. It's an amateurish exercise in programming, and any
+further features aren't guaranteed.
 
 ## Running
 

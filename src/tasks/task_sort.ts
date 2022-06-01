@@ -6,11 +6,11 @@ import { Task } from './task';
  * It is a very lightly modified adaptation of https://www.softnami.com/posts_pr/algorithms-1quick-sort-using-typescript.html.
  *
  * Sorts in descending order.
- * 
+ *
  * @class TaskQuickSort
  * @constructor
  */
- export class TaskQuickSort {
+export class TaskQuickSort {
   private arr: Task[];
 
   constructor() {}
@@ -27,8 +27,7 @@ import { Task } from './task';
         this.arr = array;
         this.quicksort(0, this.arr.length - 1, ascending);
       }
-    }
-    else {
+    } else {
       throw new Error('invalid task array for sorting');
     }
   }
@@ -41,7 +40,7 @@ import { Task } from './task';
    * @param {Number} j Index of array to swap.
    */
   private swap(i: number, j: number): void {
-    let temp: Task = this.arr[i];
+    const temp: Task = this.arr[i];
     this.arr[i] = this.arr[j];
     this.arr[j] = temp;
   }
@@ -56,35 +55,34 @@ import { Task } from './task';
   private quicksort(low: number, high: number, ascending?: boolean): void {
     let i: number = low;
     let j: number = high;
-    let pivot: number = this.arr[Math.floor((low + high) / 2)].importance;
+    const pivot: number = this.arr[Math.floor((low + high) / 2)].importance;
 
     if (ascending) {
       while (i <= j) {
         while (this.arr[i].importance < pivot) {
           i++;
         }
-  
+
         while (this.arr[j].importance > pivot) {
           j--;
         }
-  
+
         if (i <= j) {
           this.swap(i, j);
           i++;
           j--;
         }
       }
-    }
-    else {
+    } else {
       while (i <= j) {
         while (this.arr[i].importance > pivot) {
           i++;
         }
-  
+
         while (this.arr[j].importance < pivot) {
           j--;
         }
-  
+
         if (i <= j) {
           this.swap(i, j);
           i++;

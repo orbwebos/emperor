@@ -1,25 +1,29 @@
 import { format } from 'date-fns';
 import chalk from 'chalk';
-import { ConfigManager } from './config_manager'; const config = new ConfigManager();
+import { ConfigManager } from './config_manager';
+
+const config = new ConfigManager();
 
 function ownerReport(client: any, message: any): void {
-  client.users.fetch(config.bot.owner_id)
-  .then(owner => owner.send(`\`\`\`${message}\`\`\``))
-  .catch(e => console.error(e));
+  client.users
+    .fetch(config.bot.owner_id)
+    .then((owner) => owner.send(`\`\`\`${message}\`\`\``))
+    .catch((e) => console.error(e));
 }
 
 function writeToLogChannel(client: any, message: any) {
-  client.guilds.fetch(config.bot.logging_guild)
-  .then(guild => guild.channels.fetch(config.bot.logging_channel))
-  .then(channel => {
-    if (channel.type === 'GUILD_TEXT') {
-      // @ts-ignore: Property 'send' does not exist on type 'TextChannel'.
-      return channel.send(`\`\`\`${message}\`\`\``);
-    }
-  })
-  .catch(e => {
-    console.error(e);
-  });
+  client.guilds
+    .fetch(config.bot.logging_guild)
+    .then((guild) => guild.channels.fetch(config.bot.logging_channel))
+    .then((channel) => {
+      if (channel.type === 'GUILD_TEXT') {
+        // @ts-ignore: Property 'send' does not exist on type 'TextChannel'.
+        return channel.send(`\`\`\`${message}\`\`\``);
+      }
+    })
+    .catch((e) => {
+      console.error(e);
+    });
 }
 
 const NOTIFY = 60;
@@ -29,26 +33,28 @@ const WARNING = 30;
 const INFO = 20;
 const DEBUG = 10;
 
-function getDate(): {string: string, color: string} {
+function getDate(): { string: string; color: string } {
   const now = new Date();
   const dateStr = format(now, 'yyyy/MM/dd HH:mm:ss');
-  return {string: dateStr, color: chalk.green(dateStr)};
+  return { string: dateStr, color: chalk.green(dateStr) };
 }
 
-function getLevel(level: 'NOTIFY' | 'FATAL' | 'ERROR' | 'WARNING' | 'INFO' | 'DEBUG'): {string: string, color: string} {
+function getLevel(
+  level: 'NOTIFY' | 'FATAL' | 'ERROR' | 'WARNING' | 'INFO' | 'DEBUG'
+): { string: string; color: string } {
   switch (level) {
     case 'NOTIFY':
-      return {string: level, color: chalk.bgGreen.black.bold(level)};
+      return { string: level, color: chalk.bgGreen.black.bold(level) };
     case 'FATAL':
-      return {string: level, color: chalk.red(level)};
+      return { string: level, color: chalk.red(level) };
     case 'ERROR':
-      return {string: level, color: chalk.magenta(level)};
+      return { string: level, color: chalk.magenta(level) };
     case 'WARNING':
-      return {string: level, color: chalk.yellow(level)};
+      return { string: level, color: chalk.yellow(level) };
     case 'INFO':
-      return {string: level, color: chalk.blue(level)};
+      return { string: level, color: chalk.blue(level) };
     case 'DEBUG':
-      return {string: level, color: chalk.cyan(level)};
+      return { string: level, color: chalk.cyan(level) };
   }
 }
 

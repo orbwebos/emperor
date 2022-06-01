@@ -1,5 +1,5 @@
 export class WordDetector {
-  words: string[]
+  words: string[];
 
   constructor(words: string[]) {
     this.words = words;

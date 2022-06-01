@@ -1,7 +1,7 @@
+import { MessageActionRow, MessageButton } from 'discord.js';
 import { Replier, Retorter } from '../util/sender_replier';
 import { BaseTaskUser } from './base_task_user';
-import { EmperorTitle } from '../util/emperor_title';
-import { MessageActionRow, MessageButton } from 'discord.js';
+import { EmperorTitle } from '../emperor/title';
 import * as log from '../util/logging';
 import { resolveTimeZone } from './helpers';
 import { Task } from './task';
@@ -17,7 +17,7 @@ class TaskDiscordContext {
   private replier: Replier;
   private readonly initialInteraction: any;
   private readonly baseTaskUser: BaseTaskUser;
-  private taskDiscordHelper: TaskDiscordHelper
+  private taskDiscordHelper: TaskDiscordHelper;
   private initialized: boolean;
   private retorter: Retorter;
   private readonly depherEphemerally: boolean;
@@ -25,157 +25,237 @@ class TaskDiscordContext {
   constructor(replier: Replier, depherEphemerally?: boolean) {
     if (depherEphemerally === undefined) {
       this.depherEphemerally = true;
-    }
-    else {
+    } else {
       this.depherEphemerally = depherEphemerally;
     }
 
     if (replier.interaction.replied) {
-      throw new Error('Error in creating task setup context: replier\'s interaction has already been replied.');
+      throw new Error(
+        "Error in creating task setup context: replier's interaction has already been replied."
+      );
     }
-    
+
     this.replier = replier;
     this.baseTaskUser = new BaseTaskUser(replier.interaction.user.id);
     this.title = new EmperorTitle(replier.interaction);
     this.initialInteraction = replier.interaction;
   }
 
-  private async ensureUserIsRegistered(): Promise<{replier: Replier, canEditOriginal: boolean, message: string}> {
+  private async ensureUserIsRegistered(): Promise<{
+    replier: Replier;
+    canEditOriginal: boolean;
+    message: string;
+  }> {
     if (this.baseTaskUser.isRegistered()) {
-      return { replier: this.replier, canEditOriginal: true, message: 'WAS_REGISTERED' };
+      return {
+        replier: this.replier,
+        canEditOriginal: true,
+        message: 'WAS_REGISTERED',
+      };
     }
-  
-    const row = new MessageActionRow()
-        .addComponents(
-          new MessageButton()
-            .setCustomId('registration-declined')
-            .setLabel('Cancel')
-            .setStyle('SECONDARY'),
-          new MessageButton()
-            .setCustomId('registration-accepted')
-            .setLabel('Sign up')
-            .setStyle('PRIMARY'),
-        );
-  
-    const row2 = new MessageActionRow()
-      .addComponents(
-        new MessageButton()
-          .setCustomId('timezone-prompt-cancelled')
-          .setLabel('Cancel')
-          .setStyle('SECONDARY'),
-        );
-  
-    const row3 = new MessageActionRow()
-      .addComponents(
-        new MessageButton()
-          .setCustomId('timezone-cancelled')
-          .setLabel('Cancel')
-          .setStyle('SECONDARY'),
-        new MessageButton()
-          .setCustomId('timezone-confirmed')
-          .setLabel('Yes')
-          .setStyle('PRIMARY'),
-        );
-  
-    const buttonFilter = i => i.customId === 'registration-declined' || i.customId === 'registration-accepted' && i.user.id === this.replier.interaction.user.id;
-    const buttonFilter2 = i => i.customId === 'timezone-prompt-cancelled' && i.user.id == this.replier.interaction.user.id;
-    const buttonFilter3 = i => i.customId === 'timezone-cancelled' || i.customId === 'timezone-confirmed' && i.user.id === this.replier.interaction.user.id;
-    const collector = await this.replier.interaction.channel.createMessageComponentCollector({ buttonFilter, time: 300000 });
-  
-    await this.replier.editReplyWithComponent(this.title.choice, 'This seems to be your first time using the Tasks module. Do you wish to sign up now?', row);
-  
-    return new Promise(function(resolve, reject) {
+
+    const row = new MessageActionRow().addComponents(
+      new MessageButton()
+        .setCustomId('registration-declined')
+        .setLabel('Cancel')
+        .setStyle('SECONDARY'),
+      new MessageButton()
+        .setCustomId('registration-accepted')
+        .setLabel('Sign up')
+        .setStyle('PRIMARY')
+    );
+
+    const row2 = new MessageActionRow().addComponents(
+      new MessageButton()
+        .setCustomId('timezone-prompt-cancelled')
+        .setLabel('Cancel')
+        .setStyle('SECONDARY')
+    );
+
+    const row3 = new MessageActionRow().addComponents(
+      new MessageButton()
+        .setCustomId('timezone-cancelled')
+        .setLabel('Cancel')
+        .setStyle('SECONDARY'),
+      new MessageButton()
+        .setCustomId('timezone-confirmed')
+        .setLabel('Yes')
+        .setStyle('PRIMARY')
+    );
+
+    const buttonFilter = (i) =>
+      i.customId === 'registration-declined' ||
+      (i.customId === 'registration-accepted' &&
+        i.user.id === this.replier.interaction.user.id);
+    const buttonFilter2 = (i) =>
+      i.customId === 'timezone-prompt-cancelled' &&
+      i.user.id == this.replier.interaction.user.id;
+    const buttonFilter3 = (i) =>
+      i.customId === 'timezone-cancelled' ||
+      (i.customId === 'timezone-confirmed' &&
+        i.user.id === this.replier.interaction.user.id);
+    const collector =
+      await this.replier.interaction.channel.createMessageComponentCollector({
+        buttonFilter,
+        time: 300000,
+      });
+
+    await this.replier.editReplyWithComponent(
+      this.title.choice,
+      'This seems to be your first time using the Tasks module. Do you wish to sign up now?',
+      row
+    );
+
+    return new Promise((resolve, reject) => {
       try {
-        collector.once('collect', async i => {
+        collector.once('collect', async (i) => {
           await collector.stop();
-          const embedCancelled = this.replier.emperorEmbed(this.title.cancelled, 'You have cancelled the sign-up process.', this.replier.color);
+          const embedCancelled = this.replier.emperorEmbed(
+            this.title.cancelled,
+            'You have cancelled the sign-up process.',
+            this.replier.color
+          );
           if (i.customId === 'registration-accepted') {
-            const embedTop = this.replier.emperorEmbed(this.title.prompt, `Please, send your time zone in IANA format. If ${new ConfigManager().bot.name} has the necessary permissions, your message will be deleted as soon as it is received.\n[Click here to see the list of time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).\n\nAn example of a valid response: **America/New_York**.`, this.replier.color);
-  
-            const messageFilter = m => this.replier.interaction.user.id === m.author.id;
-            const messageCollector = this.replier.interaction.channel.createMessageCollector({ messageFilter, time: 300000 });
-  
+            const embedTop = this.replier.emperorEmbed(
+              this.title.prompt,
+              `Please, send your time zone in IANA format. If ${
+                new ConfigManager().bot.name
+              } has the necessary permissions, your message will be deleted as soon as it is received.\n[Click here to see the list of time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).\n\nAn example of a valid response: **America/New_York**.`,
+              this.replier.color
+            );
+
+            const messageFilter = (m) =>
+              this.replier.interaction.user.id === m.author.id;
+            const messageCollector =
+              this.replier.interaction.channel.createMessageCollector({
+                messageFilter,
+                time: 300000,
+              });
+
             await i.update({ embeds: [embedTop], components: [row2] });
-  
-            messageCollector.once('collect', async j => {
+
+            messageCollector.once('collect', async (j) => {
               await messageCollector.stop();
               await i.editReply({ embeds: [embedTop], components: [] });
               try {
                 await j.delete();
-              }
-              catch(e) {
+              } catch (e) {
                 log.debug(`Couldn't delete message ${j.id}: ${e}.`);
               }
-              const collector3 = await this.replier.interaction.channel.createMessageComponentCollector({ buttonFilter3, time: 300000 });
+              const collector3 =
+                await this.replier.interaction.channel.createMessageComponentCollector(
+                  { buttonFilter3, time: 300000 }
+                );
               let tz: string = '';
               try {
                 tz = resolveTimeZone(j.content);
-              }
-              catch(e) {
+              } catch (e) {
                 const tzErrorReplier = new Replier(i, this.replier.color);
-                resolve({ replier: tzErrorReplier, canEditOriginal: false, message: 'TIMEZONE_HAS_NO_MATCHES' });
+                resolve({
+                  replier: tzErrorReplier,
+                  canEditOriginal: false,
+                  message: 'TIMEZONE_HAS_NO_MATCHES',
+                });
               }
-              const embedBottom = this.replier.emperorEmbed(this.title.choice, `Your time zone is: **${tz}**, is this correct?`, this.replier.color);
-              await i.followUp({ embeds: [embedBottom], ephemeral: true, components: [row3] });
-              collector3.once('collect', async k => {
+              const embedBottom = this.replier.emperorEmbed(
+                this.title.choice,
+                `Your time zone is: **${tz}**, is this correct?`,
+                this.replier.color
+              );
+              await i.followUp({
+                embeds: [embedBottom],
+                ephemeral: true,
+                components: [row3],
+              });
+              collector3.once('collect', async (k) => {
                 await collector3.stop();
                 if (k.customId === 'timezone-confirmed') {
                   const replier = new Replier(k, this.replier.color);
                   try {
                     await this.baseTaskUser.register(tz);
-                  }
-                  catch(e){
+                  } catch (e) {
                     log.error(this.replier.interaction.client, e);
-                    resolve({ replier: replier, canEditOriginal: false, message: 'USER_REGISTRATION_ERROR' });
+                    resolve({
+                      replier,
+                      canEditOriginal: false,
+                      message: 'USER_REGISTRATION_ERROR',
+                    });
                   }
-  
-                  const embed = this.replier.emperorEmbed(this.title.response, 'You have successfully signed up.', this.replier.color);
+
+                  const embed = this.replier.emperorEmbed(
+                    this.title.response,
+                    'You have successfully signed up.',
+                    this.replier.color
+                  );
                   await k.update({ embeds: [embed], components: [] });
-                  resolve({ replier: replier, canEditOriginal: false, message: 'REGISTERED' });
-                }
-                else if (k.customId === 'timezone-cancelled') {
-                  await k.update({ embeds: [embedCancelled], components: [] });
+                  resolve({
+                    replier,
+                    canEditOriginal: false,
+                    message: 'REGISTERED',
+                  });
+                } else if (k.customId === 'timezone-cancelled') {
+                  await k.update({
+                    embeds: [embedCancelled],
+                    components: [],
+                  });
                   const replier = new Replier(k, this.replier.color);
-                  resolve({ replier: replier, canEditOriginal: false, message: 'CANCELLED_ON_TIMEZONE_CONFIRMATION' });
+                  resolve({
+                    replier,
+                    canEditOriginal: false,
+                    message: 'CANCELLED_ON_TIMEZONE_CONFIRMATION',
+                  });
                 }
               });
             });
-  
-            const collector2 = await this.replier.interaction.channel.createMessageComponentCollector({ buttonFilter2, time: 300000 });
-            collector2.once('collect', async j => {
+
+            const collector2 =
+              await this.replier.interaction.channel.createMessageComponentCollector(
+                { buttonFilter2, time: 300000 }
+              );
+            collector2.once('collect', async (j) => {
               await collector2.stop();
               if (j.customId === 'timezone-prompt-cancelled') {
                 await messageCollector.stop();
                 await j.update({ embeds: [embedCancelled], components: [] });
                 const replier = new Replier(j, this.replier.color);
-                resolve({ replier: replier, canEditOriginal: false, message: 'CANCELLED_ON_TIMEZONE_PROMPT' });
+                resolve({
+                  replier,
+                  canEditOriginal: false,
+                  message: 'CANCELLED_ON_TIMEZONE_PROMPT',
+                });
               }
             });
-          }
-          else if (i.customId === 'registration-declined') {
+          } else if (i.customId === 'registration-declined') {
             await i.update({ embeds: [embedCancelled], components: [] });
             const replier = new Replier(i, this.replier.color);
-            resolve({ replier: replier, canEditOriginal: false, message: 'CANCELLED_ON_FIRST' });
+            resolve({
+              replier,
+              canEditOriginal: false,
+              message: 'CANCELLED_ON_FIRST',
+            });
           }
         });
-      }
-      catch(e) {
+      } catch (e) {
         reject(e);
       }
-    }.bind(this));
+    });
   }
 
-  private async registrationPipeline(): Promise<{replier: Replier, canEditOriginal: boolean, message: string}> {
+  private async registrationPipeline(): Promise<{
+    replier: Replier;
+    canEditOriginal: boolean;
+    message: string;
+  }> {
     const resp = await this.ensureUserIsRegistered();
     this.replier = resp.replier;
     switch (resp.message) {
       case 'TIMEZONE_HAS_NO_MATCHES': {
-        let e = new Error('user-provided timezone had no matches');
+        const e = new Error('user-provided timezone had no matches');
         e.name = 'InputError';
         throw e;
       }
       case 'USER_REGISTRATION_ERROR': {
-        let e = new Error('there was an error during user registration');
+        const e = new Error('there was an error during user registration');
         e.name = 'GenericError';
         throw e;
       }
@@ -185,31 +265,50 @@ class TaskDiscordContext {
   }
 
   public async addTaskFromContext(): Promise<Task> {
-    return this.taskDiscordHelper.addTaskFromInteraction(this.initialInteraction);
+    return this.taskDiscordHelper.addTaskFromInteraction(
+      this.initialInteraction
+    );
   }
 
   public async searchFromContext(): Promise<Task[]> {
-    return this.taskDiscordHelper.searchFromInteraction(this.initialInteraction);
+    return this.taskDiscordHelper.searchFromInteraction(
+      this.initialInteraction
+    );
   }
 
   public async searchFromOptions(options: TaskSearchOptions): Promise<Task[]> {
     return this.taskDiscordHelper.search(options);
   }
 
-  public async editFromContext(): Promise<{ original: Task, modified: Task }> {
+  public async editFromContext(): Promise<{ original: Task; modified: Task }> {
     return this.taskDiscordHelper.editFromInteraction(this.initialInteraction);
   }
 
-  public async removeFromContext(): Promise<{ trashed: Task[], removed: Task[] }> {
-    return this.taskDiscordHelper.removeFromInteraction(this.initialInteraction);
+  public async removeFromContext(): Promise<{
+    trashed: Task[];
+    removed: Task[];
+  }> {
+    return this.taskDiscordHelper.removeFromInteraction(
+      this.initialInteraction
+    );
   }
 
-  public async changeStatusFromContext(): Promise<{ tasks: Task[], status: TaskStatus }> {
-    return this.taskDiscordHelper.changeStatusFromInteraction(this.initialInteraction);
+  public async changeStatusFromContext(): Promise<{
+    tasks: Task[];
+    status: TaskStatus;
+  }> {
+    return this.taskDiscordHelper.changeStatusFromInteraction(
+      this.initialInteraction
+    );
   }
 
-  public async editUserConfigFromContext(): Promise<{ map: Map<string, { original: string, modified: string }>, optionsPassed: boolean }> {
-    return this.taskDiscordHelper.editUserConfigFromInteraction(this.initialInteraction);
+  public async editUserConfigFromContext(): Promise<{
+    map: Map<string, { original: string; modified: string }>;
+    optionsPassed: boolean;
+  }> {
+    return this.taskDiscordHelper.editUserConfigFromInteraction(
+      this.initialInteraction
+    );
   }
 
   private shortFormatForCourse(tasks: Task[], taskSeparator: string): string {
@@ -228,15 +327,13 @@ class TaskDiscordContext {
 
         if (t.priority === 1) {
           toReturn += '‼ ';
-        }
-        else if (t.priority === 2) {
+        } else if (t.priority === 2) {
           toReturn += '❗ ';
         }
 
         if (t.dates.deadline.reminder) {
           toReturn += '🔔 ';
-        }
-        else {
+        } else {
           toReturn += '🔕 ';
         }
 
@@ -249,7 +346,9 @@ class TaskDiscordContext {
         }
 
         toReturn += `**${t.title}** `;
-        toReturn += this.taskDiscordHelper.stringFromStatus(t.status.code) + '\n';
+        toReturn += `${this.taskDiscordHelper.stringFromStatus(
+          t.status.code
+        )}\n`;
 
         if (t.description) {
           toReturn += `*${t.description}*\n`;
@@ -266,17 +365,18 @@ class TaskDiscordContext {
         }
 
         if (t.trash.isIn && t.trash.deletionDate) {
-          const timestamp = Math.floor(t.trash.deletionDate.date.getTime() / 1000);
+          const timestamp = Math.floor(
+            t.trash.deletionDate.date.getTime() / 1000
+          );
           toReturn += `**Will be permanently removed <t:${timestamp.toString()}:R>**\n`;
         }
 
         toReturn += '**ID:** `';
 
         if (t.customId) {
-          toReturn += t.customId + '`';
-        }
-        else {
-          toReturn += t.id + '`';
+          toReturn += `${t.customId}\``;
+        } else {
+          toReturn += `${t.id}\``;
         }
 
         if (parseInt(i) !== tasks.length - 1) {
@@ -285,9 +385,8 @@ class TaskDiscordContext {
       }
       return toReturn;
     }
-    else {
-      return '';
-    }
+
+    return '';
   }
 
   private longFormatForCourse(tasks: Task[], taskSeparator: string): string {
@@ -306,15 +405,13 @@ class TaskDiscordContext {
 
         if (t.priority === 1) {
           toReturn += '‼ ';
-        }
-        else if (t.priority === 2) {
+        } else if (t.priority === 2) {
           toReturn += '❗ ';
         }
 
         if (t.dates.deadline.reminder) {
           toReturn += '🔔 ';
-        }
-        else {
+        } else {
           toReturn += '🔕 ';
         }
 
@@ -327,7 +424,9 @@ class TaskDiscordContext {
         }
 
         toReturn += `**${t.title}** `;
-        toReturn += this.taskDiscordHelper.stringFromStatus(t.status.code) + '\n';
+        toReturn += `${this.taskDiscordHelper.stringFromStatus(
+          t.status.code
+        )}\n`;
 
         if (t.description) {
           toReturn += `*${t.description}*\n`;
@@ -358,17 +457,18 @@ class TaskDiscordContext {
         }
 
         if (t.trash.isIn && t.trash.deletionDate) {
-          const timestamp = Math.floor(t.trash.deletionDate.date.getTime() / 1000);
+          const timestamp = Math.floor(
+            t.trash.deletionDate.date.getTime() / 1000
+          );
           toReturn += `**Will be permanently removed <t:${timestamp.toString()}:R>**\n`;
         }
 
         toReturn += '**ID:** `';
 
         if (t.customId) {
-          toReturn += t.customId + '`';
-        }
-        else {
-          toReturn += t.id + '`';
+          toReturn += `${t.customId}\``;
+        } else {
+          toReturn += `${t.id}\``;
         }
 
         if (parseInt(i) !== tasks.length - 1) {
@@ -377,9 +477,8 @@ class TaskDiscordContext {
       }
       return toReturn;
     }
-    else {
-      return '';
-    }
+
+    return '';
   }
 
   private shortFormatNoGrouping(tasks: Task[], taskSeparator: string): string {
@@ -390,8 +489,10 @@ class TaskDiscordContext {
 
         if (parseInt(i) === 0) {
           toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
-        }
-        else if (parseInt(i) !== 0 && tasks[(parseInt(i) - 1).toString()].context.code !== t.context.code) {
+        } else if (
+          parseInt(i) !== 0 &&
+          tasks[(parseInt(i) - 1).toString()].context.code !== t.context.code
+        ) {
           toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
         }
 
@@ -401,15 +502,13 @@ class TaskDiscordContext {
 
         if (t.priority === 1) {
           toReturn += '‼ ';
-        }
-        else if (t.priority === 2) {
+        } else if (t.priority === 2) {
           toReturn += '❗ ';
         }
 
         if (t.dates.deadline.reminder) {
           toReturn += '🔔 ';
-        }
-        else {
+        } else {
           toReturn += '🔕 ';
         }
 
@@ -422,7 +521,9 @@ class TaskDiscordContext {
         }
 
         toReturn += `**${t.title}** `;
-        toReturn += this.taskDiscordHelper.stringFromStatus(t.status.code) + '\n';
+        toReturn += `${this.taskDiscordHelper.stringFromStatus(
+          t.status.code
+        )}\n`;
 
         if (t.description) {
           toReturn += `*${t.description}*\n`;
@@ -439,17 +540,18 @@ class TaskDiscordContext {
         }
 
         if (t.trash.isIn && t.trash.deletionDate) {
-          const timestamp = Math.floor(t.trash.deletionDate.date.getTime() / 1000);
+          const timestamp = Math.floor(
+            t.trash.deletionDate.date.getTime() / 1000
+          );
           toReturn += `**Will be permanently removed <t:${timestamp.toString()}:R>**\n`;
         }
 
         toReturn += '**ID:** `';
 
         if (t.customId) {
-          toReturn += t.customId + '`';
-        }
-        else {
-          toReturn += t.id + '`';
+          toReturn += `${t.customId}\``;
+        } else {
+          toReturn += `${t.id}\``;
         }
 
         if (parseInt(i) !== tasks.length - 1) {
@@ -458,9 +560,8 @@ class TaskDiscordContext {
       }
       return toReturn;
     }
-    else {
-      return '';
-    }
+
+    return '';
   }
 
   private longFormatNoGrouping(tasks: Task[], taskSeparator: string): string {
@@ -471,8 +572,10 @@ class TaskDiscordContext {
 
         if (parseInt(i) === 0) {
           toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
-        }
-        else if (parseInt(i) !== 0 && tasks[(parseInt(i) - 1).toString()].context.code !== t.context.code) {
+        } else if (
+          parseInt(i) !== 0 &&
+          tasks[(parseInt(i) - 1).toString()].context.code !== t.context.code
+        ) {
           toReturn += `**——— __${t.context.string.toUpperCase()}__**\n`;
         }
 
@@ -482,15 +585,13 @@ class TaskDiscordContext {
 
         if (t.priority === 1) {
           toReturn += '‼ ';
-        }
-        else if (t.priority === 2) {
+        } else if (t.priority === 2) {
           toReturn += '❗ ';
         }
 
         if (t.dates.deadline.reminder) {
           toReturn += '🔔 ';
-        }
-        else {
+        } else {
           toReturn += '🔕 ';
         }
 
@@ -503,7 +604,9 @@ class TaskDiscordContext {
         }
 
         toReturn += `**${t.title}** `;
-        toReturn += this.taskDiscordHelper.stringFromStatus(t.status.code) + '\n';
+        toReturn += `${this.taskDiscordHelper.stringFromStatus(
+          t.status.code
+        )}\n`;
 
         if (t.description) {
           toReturn += `*${t.description}*\n`;
@@ -534,17 +637,18 @@ class TaskDiscordContext {
         }
 
         if (t.trash.isIn && t.trash.deletionDate) {
-          const timestamp = Math.floor(t.trash.deletionDate.date.getTime() / 1000);
+          const timestamp = Math.floor(
+            t.trash.deletionDate.date.getTime() / 1000
+          );
           toReturn += `**Will be permanently removed <t:${timestamp.toString()}:R>**\n`;
         }
 
         toReturn += '**ID:** `';
 
         if (t.customId) {
-          toReturn += t.customId + '`';
-        }
-        else {
-          toReturn += t.id + '`';
+          toReturn += `${t.customId}\``;
+        } else {
+          toReturn += `${t.id}\``;
         }
 
         if (parseInt(i) !== tasks.length - 1) {
@@ -553,12 +657,17 @@ class TaskDiscordContext {
       }
       return toReturn;
     }
-    else {
-      return '';
-    }
+
+    return '';
   }
 
-  public format(tasks: Task[], shortFormat?: boolean, groupBy?: string, courseSeparator?: string, taskSeparator?: string): string {
+  public format(
+    tasks: Task[],
+    shortFormat?: boolean,
+    groupBy?: string,
+    courseSeparator?: string,
+    taskSeparator?: string
+  ): string {
     if (!groupBy) {
       groupBy = this.taskDiscordHelper.config.group_by;
     }
@@ -573,17 +682,24 @@ class TaskDiscordContext {
     switch (groupBy) {
       case 'course':
         for (const i in contexts) {
-          const courseTasks = tasks.filter(task => task.context.code === contexts[i]);
+          const courseTasks = tasks.filter(
+            (task) => task.context.code === contexts[i]
+          );
           if (courseTasks.length) {
             const sorter: TaskQuickSort = new TaskQuickSort();
             sorter.sort(courseTasks);
 
             let formattedCourse: string = '';
             if (shortFormat) {
-              formattedCourse = this.shortFormatForCourse(courseTasks, taskSeparator);
-            }
-            else {
-              formattedCourse = this.longFormatForCourse(courseTasks, taskSeparator);
+              formattedCourse = this.shortFormatForCourse(
+                courseTasks,
+                taskSeparator
+              );
+            } else {
+              formattedCourse = this.longFormatForCourse(
+                courseTasks,
+                taskSeparator
+              );
             }
 
             toReturn += formattedCourse;
@@ -600,27 +716,31 @@ class TaskDiscordContext {
         let formattedMessage: string = '';
         if (shortFormat) {
           formattedMessage = this.shortFormatNoGrouping(tasks, taskSeparator);
-        }
-        else {
+        } else {
           formattedMessage = this.longFormatNoGrouping(tasks, taskSeparator);
         }
 
         toReturn += formattedMessage;
         break;
       default:
-        throw new Error('invalid groupBy parameter passed to task formatting func');
+        throw new Error(
+          'invalid groupBy parameter passed to task formatting func'
+        );
     }
 
     return toReturn;
   }
 
-  public async reply(title: string, body: string, ephemeral?: boolean): Promise<void> {
+  public async reply(
+    title: string,
+    body: string,
+    ephemeral?: boolean
+  ): Promise<void> {
     if (ephemeral !== undefined) {
       return await this.retorter.retort(title, body, ephemeral);
     }
-    else {
-      return await this.retorter.retort(title, body, true);
-    }
+
+    return await this.retorter.retort(title, body, true);
   }
 
   public async init(): Promise<TaskDiscordContext> {
@@ -628,25 +748,38 @@ class TaskDiscordContext {
       throw new Error('Task Discord context has already been initialized');
     }
     if (!this.replier.interaction.deferred) {
-      await this.replier.interaction.deferReply({ ephemeral: this.depherEphemerally });
+      await this.replier.interaction.deferReply({
+        ephemeral: this.depherEphemerally,
+      });
     }
 
     try {
       const retorterInfo = await this.registrationPipeline();
-      if (retorterInfo.message === 'WAS_REGISTERED' || retorterInfo.message === 'REGISTERED') {
-        this.taskDiscordHelper = new TaskDiscordHelper(this.initialInteraction.user.id);
-      }
-      else {
-        throw new Error('user isn\'t registered. halt everything');
+      if (
+        retorterInfo.message === 'WAS_REGISTERED' ||
+        retorterInfo.message === 'REGISTERED'
+      ) {
+        this.taskDiscordHelper = new TaskDiscordHelper(
+          this.initialInteraction.user.id
+        );
+      } else {
+        throw new Error("user isn't registered. halt everything");
       }
       this.retorter = new Retorter(retorterInfo, '\n\n', 1250);
-    }
-    catch(e) {
+    } catch (e) {
       switch (e.message) {
         case 'user-provided timezone had no matches':
-          return await this.replier.followUp(this.title.error, 'No time zone matched your input.', true);
+          return await this.replier.followUp(
+            this.title.error,
+            'No time zone matched your input.',
+            true
+          );
         case 'there was an error during user registration':
-          return await this.replier.followUp(this.title.error, 'An error ocurred during sign-up. This incident has been saved.', true);
+          return await this.replier.followUp(
+            this.title.error,
+            'An error ocurred during sign-up. This incident has been saved.',
+            true
+          );
         default:
           throw new Error(e);
       }
@@ -656,7 +789,10 @@ class TaskDiscordContext {
   }
 }
 
-export async function createTaskDiscordContext(replier: Replier, depherEphemerally?: boolean): Promise<TaskDiscordContext> {
+export async function createTaskDiscordContext(
+  replier: Replier,
+  depherEphemerally?: boolean
+): Promise<TaskDiscordContext> {
   const tsctx = new TaskDiscordContext(replier, depherEphemerally);
   return await tsctx.init();
 }

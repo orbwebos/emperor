@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { ensureDirectory } from '../util/directory';
 import { resolvePathFromSource } from '../util/resolve_path';
 import { Task } from './task';
 import { TaskDiscordHelper } from './task_discord_helper';
@@ -27,8 +28,6 @@ class TaskSystem {
     for (const i in userIds) {
       this.users.push(new TaskUser(userIds[i]));
     }
-
-    return;
   }
 
   /**
@@ -39,8 +38,6 @@ class TaskSystem {
     for (const i in this.users) {
       this.tasks = this.tasks.concat(await this.users[i].allTasks());
     }
-
-    return;
   }
 
   /**
@@ -49,8 +46,6 @@ class TaskSystem {
   public async updateState(): Promise<void> {
     await this.updateUsers();
     await this.updateTasks();
-
-    return;
   }
 
   /**
@@ -89,8 +84,7 @@ class TaskSystem {
  * Returns a promise that will resolve to an initialized Task System.
  */
 export async function getTaskSystem(): Promise<TaskSystem> {
-  //@ts-ignore Argument of type '{ recursive: boolean; }' is not assignable to parameter of type 'string | number'.
-  fs.mkdirSync(resolvePathFromSource('../data/tasks'), { recursive: true });
+  ensureDirectory(resolvePathFromSource('../data/tasks'));
   const taskSystem = new TaskSystem();
   return await taskSystem.init();
 }

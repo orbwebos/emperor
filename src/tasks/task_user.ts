@@ -1,17 +1,21 @@
 import * as fs from 'fs';
 import rimraf from 'rimraf';
+import _ from 'lodash';
+import Fuse from 'fuse.js';
+import { isNullOrUndefined } from 'util';
 import { resolvePathFromSource } from '../util/resolve_path';
 import { contexts, TaskContext } from './contexts';
 import { StateManager } from '../util/state_manager';
 import { BaseTaskUser } from './base_task_user';
 import * as thelp from './helpers';
-import { Task } from './task';
-import _ from 'lodash';
-import Fuse from 'fuse.js';
-import { JsonTask } from './task';
-import { isNullOrUndefined } from 'util';
-import { TaskCreationParameters, TaskEditParameters, TaskSearchOptions } from './interfaces';
+import { Task, JsonTask } from './task';
+import {
+  TaskCreationParameters,
+  TaskEditParameters,
+  TaskSearchOptions,
+} from './interfaces';
 import { TaskStatus } from './statuses';
+import { unloadJobsStartingWith } from '../util/jobs';
 
 export class TaskUser extends BaseTaskUser {
   id: string;
@@ -19,13 +23,17 @@ export class TaskUser extends BaseTaskUser {
 
   constructor(userId: string) {
     super(userId);
-    const manager = new StateManager(`../data/tasks/${this.id}/userConfig.json`);
+    const manager = new StateManager(
+      `../data/tasks/${this.id}/userConfig.json`
+    );
     const configObject = manager.readSync();
     this.config = configObject;
   }
 
   async changeSettings(configObject: any): Promise<void> {
-    const manager = new StateManager(`../data/tasks/${this.id}/userConfig.json`);
+    const manager = new StateManager(
+      `../data/tasks/${this.id}/userConfig.json`
+    );
     await manager.edit(configObject);
     this.config = configObject;
   }
@@ -38,8 +46,7 @@ export class TaskUser extends BaseTaskUser {
             reject(err);
           }
         });
-      }
-      else {
+      } else {
         resolve('USER_DIDNT_EXIST');
       }
       resolve('USER_REMOVED');
@@ -48,7 +55,9 @@ export class TaskUser extends BaseTaskUser {
 
   walkTreeUntilParamMatch(func: any, param: any): string {
     for (const i in contexts) {
-      const files = fs.readdirSync(resolvePathFromSource(`../data/tasks/${this.id}/${contexts[i]}`));
+      const files = fs.readdirSync(
+        resolvePathFromSource(`../data/tasks/${this.id}/${contexts[i]}`)
+      );
       for (const ix in files) {
         const path = `../data/tasks/${this.id}/${contexts[i]}/${files[ix]}`;
         const returnedValue = func(path, param);
@@ -61,9 +70,11 @@ export class TaskUser extends BaseTaskUser {
   }
 
   walkTreeFindAllMatches(func: any): string[] {
-    let matches: string[] = [];
+    const matches: string[] = [];
     for (const i in contexts) {
-      const files = fs.readdirSync(resolvePathFromSource(`../data/tasks/${this.id}/${contexts[i]}`));
+      const files = fs.readdirSync(
+        resolvePathFromSource(`../data/tasks/${this.id}/${contexts[i]}`)
+      );
       for (const ix in files) {
         const path = `../data/tasks/${this.id}/${contexts[i]}/${files[ix]}`;
         if (func(path) === true) {
@@ -75,18 +86,19 @@ export class TaskUser extends BaseTaskUser {
   }
 
   async taskObjectById(id: string): Promise<JsonTask> {
-    const idMatchPath = this.walkTreeUntilParamMatch(thelp.taskInPathMatchesAnyId, id);
+    const idMatchPath = this.walkTreeUntilParamMatch(
+      thelp.taskInPathMatchesAnyId,
+      id
+    );
     if (idMatchPath !== '') {
       const manager = new StateManager(idMatchPath);
       try {
         const taskData = manager.readSync();
         return taskData;
-      }
-      catch(e) {
+      } catch (e) {
         throw new Error(e);
       }
-    }
-    else {
+    } else {
       throw new Error('No match for that ID');
     }
   }
@@ -97,17 +109,18 @@ export class TaskUser extends BaseTaskUser {
   }
 
   async removeById(id: string): Promise<void> {
-    const idMatchPath = this.walkTreeUntilParamMatch(thelp.taskInPathMatchesAnyId, id);
+    const idMatchPath = this.walkTreeUntilParamMatch(
+      thelp.taskInPathMatchesAnyId,
+      id
+    );
     if (idMatchPath !== '') {
       try {
-        thelp.unloadJobsStartingWith(id);
+        unloadJobsStartingWith(id);
         return fs.unlinkSync(resolvePathFromSource(idMatchPath));
-      }
-      catch(e) {
+      } catch (e) {
         throw new Error(e);
       }
-    }
-    else {
+    } else {
       throw new Error('No match for that ID');
     }
   }
@@ -117,20 +130,23 @@ export class TaskUser extends BaseTaskUser {
     if (matches.length > 0) {
       return matches;
     }
-    else {
-      throw new Error('No tasks found');
-    }
+
+    throw new Error('No tasks found');
   }
 
   taskFromObject(jsonTask: JsonTask): Task {
     const task = new Task({
-      existing: { id: jsonTask.id, customId: jsonTask.custom_id, dateTrashed: jsonTask.trash.date_added },
+      existing: {
+        id: jsonTask.id,
+        customId: jsonTask.custom_id,
+        dateTrashed: jsonTask.trash.date_added,
+      },
       title: jsonTask.title,
-      contextCode: (jsonTask.context.code as TaskContext),
+      contextCode: jsonTask.context.code as TaskContext,
       user: this,
       description: jsonTask.description,
       priority: jsonTask.priority,
-      statusCode: (jsonTask.status.code as TaskStatus),
+      statusCode: jsonTask.status.code as TaskStatus,
       customId: jsonTask.custom_id,
       markAsTrashed: jsonTask.trash.is_in,
       date: jsonTask.dates.string,
@@ -141,26 +157,25 @@ export class TaskUser extends BaseTaskUser {
       deadlineReminderOffset: jsonTask.dates.deadline.offset,
       deadlineKeepRemindingFor: jsonTask.dates.deadline.days_remind_after,
       asleep: jsonTask.dormant,
-      wakeIn: jsonTask.dates.wake
+      wakeIn: jsonTask.dates.wake,
     });
 
     return task;
   }
 
   async allTaskObjects(): Promise<JsonTask[]> {
-    let tasks: JsonTask[] = []
+    const tasks: JsonTask[] = [];
     try {
       const paths = await this.allTaskPaths();
       for (const i in paths) {
         const manager = new StateManager(paths[i]);
         tasks.push(manager.readSync());
       }
-    }
-    catch(e) {
+    } catch (e) {
       throw new Error(e);
     }
 
-    return tasks
+    return tasks;
   }
 
   async allTasks(): Promise<Task[]> {
@@ -177,14 +192,17 @@ export class TaskUser extends BaseTaskUser {
   async write(cTask: Task): Promise<any> {
     const task = await cTask.getObject();
     return new Promise<any>((resolve, reject) => {
-      const manager = new StateManager(`../data/tasks/${this.id}/${task.context.code}/${task.id}.json`);
-      manager.edit(task)
-      .then(response => {
-        if (response.includes('Wrote to')) {
-          resolve(task);
-        }
-      })
-      .catch(e => reject(`Couldn't register task: ${e}`));
+      const manager = new StateManager(
+        `../data/tasks/${this.id}/${task.context.code}/${task.id}.json`
+      );
+      manager
+        .edit(task)
+        .then((response) => {
+          if (response.includes('Wrote to')) {
+            resolve(task);
+          }
+        })
+        .catch((e) => reject(`Couldn't register task: ${e}`));
     });
   }
 
@@ -194,8 +212,7 @@ export class TaskUser extends BaseTaskUser {
 
       await this.write(task);
       return task;
-    }
-    catch(e) {
+    } catch (e) {
       throw new Error(`Error in adding task: ${e}`);
     }
   }
@@ -205,82 +222,131 @@ export class TaskUser extends BaseTaskUser {
 
     const titleSearch = {
       threshold: 0.4,
-      keys: [
-        'title'
-      ]
+      keys: ['title'],
     };
 
     const descriptionSearch = {
-      keys: [
-        'description'
-      ]
+      keys: ['description'],
     };
 
     const fuseTitle = new Fuse(allTasks, titleSearch);
     const fuseDescription = new Fuse(allTasks, descriptionSearch);
 
-    const titleResults: Fuse.FuseResult<Task>[] | Task[] = filters.title ? fuseTitle.search(filters.title) : allTasks;
-    const descriptionResults: Fuse.FuseResult<Task>[] | Task[] = filters.description ? fuseDescription.search(filters.description) : allTasks;
+    const titleResults: Fuse.FuseResult<Task>[] | Task[] = filters.title
+      ? fuseTitle.search(filters.title)
+      : allTasks;
+    const descriptionResults: Fuse.FuseResult<Task>[] | Task[] =
+      filters.description
+        ? fuseDescription.search(filters.description)
+        : allTasks;
 
-    let resultsJunction = _.intersection(thelp.ensureIsTaskArray(titleResults), thelp.ensureIsTaskArray(descriptionResults));
+    let resultsJunction = _.intersection(
+      thelp.ensureIsTaskArray(titleResults),
+      thelp.ensureIsTaskArray(descriptionResults)
+    );
 
     if (!isNullOrUndefined(filters.id)) {
-      resultsJunction = resultsJunction.filter(task => task.id === filters.id || task.customId === filters.id);
+      resultsJunction = resultsJunction.filter(
+        (task) => task.id === filters.id || task.customId === filters.id
+      );
     }
     if (!isNullOrUndefined(filters.statusCode)) {
-      resultsJunction = resultsJunction.filter(task => task.status.code === filters.statusCode);
+      resultsJunction = resultsJunction.filter(
+        (task) => task.status.code === filters.statusCode
+      );
     }
     if (!isNullOrUndefined(filters.contextCode)) {
-      resultsJunction = resultsJunction.filter(task => task.context.code === filters.contextCode);
+      resultsJunction = resultsJunction.filter(
+        (task) => task.context.code === filters.contextCode
+      );
     }
     if (!isNullOrUndefined(filters.date)) {
-      resultsJunction = resultsJunction.filter(task => !isNullOrUndefined(task.dates.string) && task.dates.string.includes(filters.date));
+      resultsJunction = resultsJunction.filter(
+        (task) =>
+          !isNullOrUndefined(task.dates.string) &&
+          task.dates.string.includes(filters.date)
+      );
     }
     if (!isNullOrUndefined(filters.deadline)) {
-      resultsJunction = resultsJunction.filter(task => !isNullOrUndefined(task.dates.deadline.string) && task.dates.deadline.string.includes(filters.deadline));
+      resultsJunction = resultsJunction.filter(
+        (task) =>
+          !isNullOrUndefined(task.dates.deadline.string) &&
+          task.dates.deadline.string.includes(filters.deadline)
+      );
     }
     if (!isNullOrUndefined(filters.asleep)) {
-      resultsJunction = resultsJunction.filter(task => task.dormant === filters.asleep);
+      resultsJunction = resultsJunction.filter(
+        (task) => task.dormant === filters.asleep
+      );
     }
     if (!isNullOrUndefined(filters.wakeIn)) {
-      resultsJunction = resultsJunction.filter(task => !isNullOrUndefined(task.dates.wake.string) && task.dates.wake.string.includes(filters.wakeIn));
+      resultsJunction = resultsJunction.filter(
+        (task) =>
+          !isNullOrUndefined(task.dates.wake.string) &&
+          task.dates.wake.string.includes(filters.wakeIn)
+      );
     }
     if (!isNullOrUndefined(filters.late)) {
-      resultsJunction = resultsJunction.filter(task => task.late === filters.late);
+      resultsJunction = resultsJunction.filter(
+        (task) => task.late === filters.late
+      );
     }
     if (!isNullOrUndefined(filters.trash)) {
-      resultsJunction = resultsJunction.filter(task => task.trash.isIn === filters.trash);
+      resultsJunction = resultsJunction.filter(
+        (task) => task.trash.isIn === filters.trash
+      );
     }
 
     return resultsJunction;
   }
 
-  async edit(o: TaskEditParameters): Promise<{ original: Task, modified: Task }> {
+  async edit(
+    o: TaskEditParameters
+  ): Promise<{ original: Task; modified: Task }> {
     const t = await this.taskById(o.id);
     const original = t;
 
     const task = new Task({
-      existing: { id: t.id, customId: t.customId, dateTrashed: t.trash.dateAdded.string, editingIntention: true },
+      existing: {
+        id: t.id,
+        customId: t.customId,
+        dateTrashed: t.trash.dateAdded.string,
+        editingIntention: true,
+      },
       title: o.title ? o.title : t.title,
-      contextCode: o.contextCode ? (o.contextCode as TaskContext) : t.context.code,
+      contextCode: o.contextCode
+        ? (o.contextCode as TaskContext)
+        : t.context.code,
       user: this,
       description: o.description ? o.description : t.description,
       priority: o.priority ? o.priority : t.priority,
       statusCode: o.statusCode ? o.statusCode : t.status.code,
       customId: o.customId ? o.customId : t.customId,
-      markAsTrashed: !isNullOrUndefined(o.markAsTrashed) ? o.markAsTrashed : t.trash.isIn,
+      markAsTrashed: !isNullOrUndefined(o.markAsTrashed)
+        ? o.markAsTrashed
+        : t.trash.isIn,
       date: o.date ? o.date : t.dates.string,
       deadline: o.deadline ? o.deadline : t.dates.deadline.string,
-      deadlineReminder: !isNullOrUndefined(o.deadlineReminder) ? o.deadlineReminder : t.dates.deadline.reminder,
-      deadlineReminderDaysBefore: o.deadlineReminderDaysBefore ? o.deadlineReminderDaysBefore : t.dates.deadline.daysBefore,
-      deadlineReminderInterval: o.deadlineReminderInterval ? o.deadlineReminderInterval : t.dates.deadline.interval,
-      deadlineReminderOffset: o.deadlineReminderOffset ? o.deadlineReminderOffset : t.dates.deadline.offset,
-      deadlineKeepRemindingFor: o.deadlineKeepRemindingFor ? o.deadlineKeepRemindingFor : t.dates.deadline.daysRemindAfter,
+      deadlineReminder: !isNullOrUndefined(o.deadlineReminder)
+        ? o.deadlineReminder
+        : t.dates.deadline.reminder,
+      deadlineReminderDaysBefore: o.deadlineReminderDaysBefore
+        ? o.deadlineReminderDaysBefore
+        : t.dates.deadline.daysBefore,
+      deadlineReminderInterval: o.deadlineReminderInterval
+        ? o.deadlineReminderInterval
+        : t.dates.deadline.interval,
+      deadlineReminderOffset: o.deadlineReminderOffset
+        ? o.deadlineReminderOffset
+        : t.dates.deadline.offset,
+      deadlineKeepRemindingFor: o.deadlineKeepRemindingFor
+        ? o.deadlineKeepRemindingFor
+        : t.dates.deadline.daysRemindAfter,
       asleep: !isNullOrUndefined(o.asleep) ? o.asleep : t.dormant,
       wakeIn: o.wakeIn ? o.wakeIn : t.dates.wake.string,
     });
 
     await this.write(task);
-    return { original: original, modified: task };
+    return { original, modified: task };
   }
 }

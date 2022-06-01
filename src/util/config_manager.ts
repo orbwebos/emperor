@@ -11,7 +11,7 @@ export class ConfigManager {
 
   constructor() {
     this.secrets = {
-      botToken: process.env.BOT_TOKEN
+      botToken: process.env.BOT_TOKEN,
     };
     const botManager = new StateManager('../config/bot.json');
     const generalManager = new StateManager('../config/general.json');
