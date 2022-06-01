@@ -11,6 +11,9 @@ const client = new EmperorClient({
     Intents.FLAGS.GUILD_VOICE_STATES,
     Intents.FLAGS.DIRECT_MESSAGES,
   ],
+  logger: {
+    level: 'debug',
+  },
 });
 
 client.setupCommands(resolvePathFromSource('./commands'));

@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import * as fs from 'fs';
-import {
-  Client,
-  Collection,
-  ClientOptions,
-  CommandInteraction,
-} from 'discord.js';
+import Pino from 'pino';
+import type { Logger } from 'pino';
+import { Client, Collection, CommandInteraction } from 'discord.js';
 import { EmojiStore } from './emoji_store';
+import { EmperorClientOptions } from './client_options';
 
 export class EmperorClient extends Client {
+  public readonly logger: Logger;
   public emojiStore: EmojiStore;
   public commands: Collection<
     string,
     (interaction: CommandInteraction) => Promise<void>
   >;
 
-  constructor(options: ClientOptions) {
+  constructor(options: EmperorClientOptions) {
     super(options);
+    this.logger = Pino({ name: 'Emperor', level: options.logger.level });
     this.commands = new Collection();
     this.emojiStore = new EmojiStore();
   }

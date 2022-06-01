@@ -21,7 +21,6 @@ import {
 import { wordFilterProcess } from '../util/word_filter';
 import { analyzeFilterProcess } from '../msg_commands/analyzefilter';
 import { EmperorClient } from '../emperor/client';
-import { logger } from '../emperor/logger';
 import { ensureDirectory } from '../util/directory';
 
 const config = new ConfigManager();
@@ -43,7 +42,7 @@ export default class MessageCreateEvent extends EmperorEvent {
       return;
 
     if (message.channel instanceof DMChannel) {
-      logger.debug(`${message.author.tag} said: ${message.content}`);
+      client.logger.debug(`${message.author.tag} said: ${message.content}`);
     }
 
     const jugarRegex = /quien \w+ jugar/gi;
@@ -79,7 +78,7 @@ export default class MessageCreateEvent extends EmperorEvent {
           resolvePathFromSource(`../data/emoji_blacklist/${message.author.id}`),
           (e) => {
             if (e) {
-              logger.error(e);
+              client.logger.error(e);
               message.reply('There has been an unexpected error.');
             } else {
               message.reply("You have opted into Emperor's emoji service.");
@@ -168,7 +167,7 @@ export default class MessageCreateEvent extends EmperorEvent {
           config.wordFilter().levenshtein_lookahead
         );
     } catch (e) {
-      logger.warn(e);
+      client.logger.warn(e);
     }
 
     if (
@@ -208,7 +207,7 @@ export default class MessageCreateEvent extends EmperorEvent {
               await message.react(emoji);
             }
           } catch (e) {
-            logger.error(`Failure in "emoji reaction" directive: ${e}`);
+            client.logger.error(`Failure in "emoji reaction" directive: ${e}`);
           }
         }
         if (

@@ -1,7 +1,6 @@
 import { Interaction } from 'discord.js';
 import { EmperorEvent } from '../emperor/event';
 import { EmperorClient } from '../emperor/client';
-import { logger } from '../emperor/logger';
 
 export default class InteractionCreateEvent extends EmperorEvent {
   constructor() {
@@ -13,13 +12,13 @@ export default class InteractionCreateEvent extends EmperorEvent {
       return;
     }
     if (interaction.options.getSubcommand(false) === null) {
-      logger.info(
+      client.logger.info(
         `${interaction.user.tag} in #${
           (interaction.channel as any).name
         } triggered an interaction: ${interaction.commandName}`
       );
     } else {
-      logger.info(
+      client.logger.info(
         `${interaction.user.tag} in #${
           (interaction.channel as any).name
         } triggered an interaction: ${
@@ -34,7 +33,7 @@ export default class InteractionCreateEvent extends EmperorEvent {
       const inter = client.commands.get(interaction.commandName) as any;
       await inter(interaction);
     } catch (error) {
-      logger.error(error);
+      client.logger.error(error);
       await interaction.reply({
         content: 'There was an error while executing this command.',
         ephemeral: true,
