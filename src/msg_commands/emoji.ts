@@ -1,5 +1,3 @@
-/* eslint-disable guard-for-in */
-/* eslint-disable no-restricted-syntax */
 import { Message, TextChannel } from 'discord.js';
 import { readdirSync } from 'fs';
 import { EmperorClient } from '../emperor/client';
@@ -34,9 +32,11 @@ export async function emojiProcess(
   ) {
     const matches = emojiMatches(message.content);
     let successfulReplacement = false;
+    let workingContent = message.content;
+
     if (matches) {
-      for (const i in matches) {
-        const current = matches[i].slice(1, -1).toLowerCase();
+      matches.forEach((match: string) => {
+        const current = match.slice(1, -1).toLowerCase();
         const irlServers = [
           '605428940537987083',
           '782023593353412649',
@@ -44,33 +44,29 @@ export async function emojiProcess(
           '976579670478848010',
         ];
         const isIrlServer = (s: string) => isInArray(irlServers, s);
-        // const emoji = await msg.client.emojis.resolve('');
         const emoji = client.emojiStore.find(
-          // eslint-disable-next-line @typescript-eslint/no-shadow
-          (emoji) =>
+          (foundEmoji) =>
             // name must match and it must not be true that the emoji comes from an IRL server
             // while the destination is not an IRL server
-            emoji.name.toLowerCase() === current &&
-            !(isIrlServer(emoji.guild.id) && !isIrlServer(message.guild.id))
+            foundEmoji.name.toLowerCase() === current &&
+            !(
+              isIrlServer(foundEmoji.guild.id) && !isIrlServer(message.guild.id)
+            )
         );
-
-        // eslint-disable-next-line no-continue
-        if (!emoji) continue;
-
-        const emojiString = emoji.animated
-          ? `<${emoji.identifier}>`
-          : `<:${emoji.name}:${emoji.id}>`;
 
         if (emoji && emoji.available) {
           successfulReplacement = true;
 
-          // eslint-disable-next-line no-param-reassign
-          message.content = message.content.replaceAll(
-            matches[i],
+          const emojiString = emoji.animated
+            ? `<${emoji.identifier}>`
+            : `<:${emoji.name}:${emoji.id}>`;
+
+          workingContent = workingContent.replaceAll(
+            match,
             // if offset is 0, replace, or
             // if offset is bigger than 0 and the preceding character isn't <, replace, but only if it also isn't bigger than 1 and the 2 preceding characters aren't <a
-            // TODO: rewrite this for the love of god lol
-            (match: string, offset: number, string: string) =>
+            // TODO: rewrite this so it's actually understandable
+            (matched: string, offset: number, string: string) =>
               offset === 0 ||
               (offset > 0 &&
                 string.charAt(offset - 1) !== '<' &&
@@ -78,20 +74,21 @@ export async function emojiProcess(
                   (string.charAt(offset - 2) !== '<' &&
                     string.charAt(offset - 1) !== '<a')))
                 ? emojiString
-                : match
+                : matched
           );
         }
-      }
+      });
     }
 
     if (successfulReplacement) {
       const channel = await message.client.channels.fetch(message.channelId);
+
       if (channel instanceof TextChannel) {
         const webhooks = await channel.fetchWebhooks();
 
         let webhook = webhooks.find(
-          // eslint-disable-next-line @typescript-eslint/no-shadow
-          (webhook) => webhook.name === `${config.bot.name} Emoji Service`
+          (foundWebhook) =>
+            foundWebhook.name === `${config.bot.name} Emoji Service`
         );
         if (!webhook) {
           log.debug(
@@ -115,12 +112,11 @@ export async function emojiProcess(
           ? message.member.nickname
           : message.author.username;
 
-        // TODO: lmao
         const toSend =
-          truncateString(message.content, 1850) === message.content
-            ? message.content
+          truncateString(workingContent, 1850) === workingContent
+            ? workingContent
             : `${truncateString(
-                message.content,
+                workingContent,
                 1850
               )} **(character limit reached)**`;
 
