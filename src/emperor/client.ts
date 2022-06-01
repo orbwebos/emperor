@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import * as fs from 'fs';
 import Pino from 'pino';
 import type { Logger } from 'pino';
 import { Client, Collection, CommandInteraction } from 'discord.js';
+// eslint-disable-next-line import/no-cycle
 import { EmojiStore } from './emoji_store';
 import { EmperorClientOptions } from './client_options';
 
@@ -26,10 +26,11 @@ export class EmperorClient extends Client {
       .readdirSync(path)
       .filter((file) => file.endsWith('.js'));
 
-    for (const file of commandFiles) {
+    commandFiles.forEach((file: string) => {
+      // eslint-disable-next-line import/no-dynamic-require, global-require
       const cmd = require(`${path}/${file}`);
       this.commands.set(cmd.cmd.data.name, cmd.cmd.executer);
-    }
+    });
   }
 
   setupEvents(path: fs.PathLike): void {
@@ -38,7 +39,7 @@ export class EmperorClient extends Client {
       .filter((file) => file.endsWith('.js'));
 
     eventFiles.forEach((file: string) => {
-      // eslint-disable-next-line global-require, import/no-dynamic-require
+      // eslint-disable-next-line import/no-dynamic-require, global-require
       const Event = require(`${path}/${file}`).default;
       const data = new Event();
 
