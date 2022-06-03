@@ -5,11 +5,11 @@ import { EmperorClient } from '../emperor/client';
 import * as log from '../util/logging';
 
 export default class ReadyEvent extends EmperorEvent {
-  constructor() {
+  public constructor() {
     super('ready', true);
   }
 
-  static async execute(client: EmperorClient) {
+  public static async execute(client: EmperorClient) {
     try {
       const taskSystem = await getTaskSystem(); // problematic statement
       await taskSystem.loadDates(client);

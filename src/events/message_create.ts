@@ -25,11 +25,11 @@ import { ensureDirectory } from '../util/directory';
 
 const config = new ConfigManager();
 export default class MessageCreateEvent extends EmperorEvent {
-  constructor() {
+  public constructor() {
     super('messageCreate', false);
   }
 
-  static async execute(message: Message, client: EmperorClient) {
+  public static async execute(message: Message, client: EmperorClient) {
     if (message.author.bot) return;
 
     const lowerCaseContent = message.content.toLowerCase();
@@ -236,6 +236,7 @@ export default class MessageCreateEvent extends EmperorEvent {
     const messageOriginalArray = message.content.split(' ');
 
     if (
+      config.general.media_checker === true &&
       config.general.media_checker_guilds_whitelist.includes(
         message.guildId
       ) === true

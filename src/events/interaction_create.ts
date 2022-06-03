@@ -3,11 +3,11 @@ import { EmperorEvent } from '../emperor/event';
 import { EmperorClient } from '../emperor/client';
 
 export default class InteractionCreateEvent extends EmperorEvent {
-  constructor() {
+  public constructor() {
     super('interactionCreate', false);
   }
 
-  static async execute(interaction: Interaction, client: EmperorClient) {
+  public static async execute(interaction: Interaction, client: EmperorClient) {
     if (!interaction.isCommand()) {
       return;
     }

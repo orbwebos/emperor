@@ -3,11 +3,11 @@ import { EmperorClient } from '../emperor/client';
 import { EmperorEvent } from '../emperor/event';
 
 export default class ChannelPinsUpdate extends EmperorEvent {
-  constructor() {
+  public constructor() {
     super('channelPinsUpdate', false);
   }
 
-  static async execute(
+  public static async execute(
     channel: TextBasedChannel,
     time: Date,
     client: EmperorClient
