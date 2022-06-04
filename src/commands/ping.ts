@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { EmperorEmbedder } from '../emperor/embedder';
-import { EmperorCommand } from '../emperor/command';
+import { Command, EmbedTitle } from 'imperial-discord';
+import { CommandInteraction, Message } from 'discord.js';
+import { Embedder } from '../util/embedder';
 import { ConfigManager } from '../util/config_manager';
-import { EmperorTitle } from '../emperor/title';
 
 const config = new ConfigManager();
 
@@ -19,28 +19,28 @@ const cmdData = new SlashCommandBuilder()
       )
   );
 
-const cmdExecuter = async (i) => {
-  const invisible: boolean = !!i.options.getBoolean('invisible');
-  const title = new EmperorTitle(i);
-  const embedder = new EmperorEmbedder(i.user);
+const cmdExecuter = async (interaction: CommandInteraction) => {
+  const invisible: boolean = !!interaction.options.getBoolean('invisible');
+  const title = new EmbedTitle(interaction);
+  const embedder = new Embedder(interaction.user);
 
-  const embedInitial = embedder.emperorEmbed(
+  const embedInitial = embedder.embed(
     title.response,
-    '**Websocket heartbeat:** `...`ms\n' + '**Roundtrip latency**: `...`ms'
+    '**Websocket heartbeat:** `...`ms\n**Roundtrip latency**: `...`ms'
   );
 
-  await i.reply({ embeds: [embedInitial], ephemeral: invisible });
-  const message = await i.fetchReply();
+  await interaction.reply({ embeds: [embedInitial], ephemeral: invisible });
+  const message = await interaction.fetchReply();
 
-  const embedFinal = embedder.emperorEmbed(
+  const embedFinal = embedder.embed(
     title.response,
-    `**Websocket heartbeat:** \`${i.client.ws.ping}\`ms\n` +
+    `**Websocket heartbeat:** \`${interaction.client.ws.ping}\`ms\n` +
       `**Roundtrip latency**: \`${
-        message.createdTimestamp - i.createdTimestamp
+        (message as Message).createdTimestamp - interaction.createdTimestamp
       }\`ms`
   );
 
-  return i.editReply({ embeds: [embedFinal] });
+  return interaction.editReply({ embeds: [embedFinal] });
 };
 
-export const cmd = new EmperorCommand(cmdData, cmdExecuter);
+export const cmd = new Command(cmdData, cmdExecuter);

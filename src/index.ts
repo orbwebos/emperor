@@ -1,9 +1,9 @@
 import { Intents } from 'discord.js';
-import { EmperorClient } from './emperor/client';
+import { ImperialClient } from 'imperial-discord';
 import { ConfigManager } from './util/config_manager';
 import { resolvePathFromSource } from './util/resolve_path';
 
-const client = new EmperorClient({
+const client = new ImperialClient({
   intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES,
@@ -12,11 +12,12 @@ const client = new EmperorClient({
     Intents.FLAGS.DIRECT_MESSAGES,
   ],
   logger: {
+    name: 'Emperor',
     level: 'debug',
   },
 });
 
 client.setupCommands(resolvePathFromSource('./commands'));
-client.setupEvents(resolvePathFromSource('./events'));
+client.setupHandlers(resolvePathFromSource('./handlers'));
 
 client.login(new ConfigManager().secrets.botToken);

@@ -1,5 +1,5 @@
 import { isString } from 'util';
-import { EmperorEmbedder } from '../emperor/embedder';
+import { Embedder } from '../util/embedder';
 import { levenshteinMatches } from './levenshtein';
 import * as log from './logging';
 import { ConfigManager } from './config_manager';
@@ -52,8 +52,8 @@ export async function wordFilterProcess(
     );
 
     if (wfConfig.reply === true) {
-      const embedder = new EmperorEmbedder(msg.author);
-      const embed = embedder.emperorEmbed(
+      const embedder = new Embedder(msg.author);
+      const embed = embedder.embed(
         wfConfig.reply_title,
         wfConfig.reply_content
       );

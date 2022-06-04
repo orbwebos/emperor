@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { CommandInteraction } from 'discord.js';
+import { Command, EmbedTitle } from 'imperial-discord';
 import { ConfigManager } from '../util/config_manager';
-import { EmperorCommand } from '../emperor/command';
-import { EmperorTitle } from '../emperor/title';
 import { Replier } from '../util/sender_replier';
 
 const cmdData = new SlashCommandBuilder()
@@ -17,17 +17,17 @@ const cmdData = new SlashCommandBuilder()
       )
   );
 
-const cmdExecuter = async (i) => {
-  const invisible: boolean = !!i.options.getBoolean('invisible');
-  const title = new EmperorTitle(i);
-  const replier = new Replier(i);
+const cmdExecuter = async (interaction: CommandInteraction) => {
+  const invisible: boolean = !!interaction.options.getBoolean('invisible');
+  const title = new EmbedTitle(interaction);
+  const replier = new Replier(interaction);
 
   const cmdReply =
-    `**Server name:** ${i.guild.name}\n` +
-    `**Total members:** ${i.guild.memberCount}\n` +
-    `**Server was created in:** ${i.guild.createdAt}\n`;
+    `**Server name:** ${interaction.guild.name}\n` +
+    `**Total members:** ${interaction.guild.memberCount}\n` +
+    `**Server was created in:** ${interaction.guild.createdAt}\n`;
 
   return replier.reply(title.response, cmdReply, invisible);
 };
 
-export const cmd = new EmperorCommand(cmdData, cmdExecuter);
+export const cmd = new Command(cmdData, cmdExecuter);

@@ -1,9 +1,9 @@
 import { ColorResolvable, User, MessageEmbed } from 'discord.js';
-import { ConfigManager } from '../util/config_manager';
+import { ConfigManager } from './config_manager';
 
 const config = new ConfigManager();
 
-export class EmperorEmbedder {
+export class Embedder {
   public username: string;
   public userAvatarUrl: string;
 
@@ -18,7 +18,7 @@ export class EmperorEmbedder {
       avatarUser || (user as User).displayAvatarURL({ dynamic: true });
   }
 
-  public emperorEmbed(
+  public embed(
     title: string,
     text: string,
     color: ColorResolvable = '#7850bd'
@@ -37,7 +37,7 @@ export class EmperorEmbedder {
       .setFooter({ text: `${config.bot.name} v${config.bot.version}` });
   }
 
-  public paginatedEmperorEmbed(
+  public paginatedEmbed(
     title: string,
     text: string,
     currentPage: number,

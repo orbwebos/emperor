@@ -1,13 +1,13 @@
 import * as fs from 'fs';
 import { addHours } from 'date-fns';
-import { DMChannel, Message } from 'discord.js';
+import { Client, DMChannel, Message } from 'discord.js';
 import Minesweeper from 'discord.js-minesweeper';
 import rimraf from 'rimraf';
+import { Handler } from 'imperial-discord';
 import { ConfigManager } from '../util/config_manager';
 import { resolvePathFromSource } from '../util/resolve_path';
 import { emojiProcess } from '../msg_commands/emoji';
-import { EmperorEmbedder } from '../emperor/embedder';
-import { EmperorEvent } from '../emperor/event';
+import { Embedder } from '../util/embedder';
 import { mermaidProcess } from '../msg_commands/diagram';
 import {
   gendocAppendToDoc,
@@ -20,16 +20,15 @@ import {
 } from '../msg_commands/gendoc';
 import { wordFilterProcess } from '../util/word_filter';
 import { analyzeFilterProcess } from '../msg_commands/analyzefilter';
-import { EmperorClient } from '../emperor/client';
 import { ensureDirectory } from '../util/directory';
 
 const config = new ConfigManager();
-export default class MessageCreateEvent extends EmperorEvent {
+export default class MessageCreateHandler extends Handler {
   public constructor() {
     super('messageCreate', false);
   }
 
-  public static async execute(message: Message, client: EmperorClient) {
+  public static async execute(message: Message, client: Client) {
     if (message.author.bot) return;
 
     const lowerCaseContent = message.content.toLowerCase();
@@ -219,10 +218,10 @@ export default class MessageCreateEvent extends EmperorEvent {
           const randomIntFromInterval = (min, max) =>
             Math.floor(Math.random() * (max - min + 1) + min);
           await message.delete();
-          const embedder = new EmperorEmbedder(repliedMessage.author);
+          const embedder = new Embedder(repliedMessage.author);
           const hour = addHours(new Date(), randomIntFromInterval(5, 15));
           const timestamp = Math.floor(hour.getTime() / 1000);
-          const embed = embedder.emperorEmbed(
+          const embed = embedder.embed(
             '❗ A car bomb has been planted',
             `A car bomb has been planted in **${
               repliedMessage.author.username

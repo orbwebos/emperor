@@ -1,9 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { DiscordTogether } from 'discord-together';
-import { EmperorCommand } from '../emperor/command';
+import { Command, EmbedTitle } from 'imperial-discord';
 import { ConfigManager } from '../util/config_manager';
 import { Replier } from '../util/sender_replier';
-import { EmperorTitle } from '../emperor/title';
 
 const cmdData = new SlashCommandBuilder()
   .setName('youtube')
@@ -18,15 +17,16 @@ const cmdData = new SlashCommandBuilder()
       )
   );
 
-const cmdExecuter = async (i) => {
-  const invisible: boolean = !!i.options.getBoolean('invisible');
-  const title = new EmperorTitle(i);
-  const replier = new Replier(i);
+const cmdExecuter = async (interaction: any) => {
+  const invisible: boolean = !!interaction.options.getBoolean('invisible');
+  const title = new EmbedTitle(interaction);
+  const replier = new Replier(interaction);
 
-  i.client.discordTogether = new DiscordTogether(i.client);
-  if (i.member.voice.channel) {
-    i.client.discordTogether
-      .createTogetherCode(i.member.voice.channel.id, 'youtube')
+  // eslint-disable-next-line no-param-reassign
+  interaction.client.discordTogether = new DiscordTogether(interaction.client);
+  if (interaction.member.voice.channel) {
+    interaction.client.discordTogether
+      .createTogetherCode(interaction.member.voice.channel.id, 'youtube')
       .then(async (invite) =>
         replier.reply(
           title.response,
@@ -43,4 +43,4 @@ const cmdExecuter = async (i) => {
   }
 };
 
-export const cmd = new EmperorCommand(cmdData, cmdExecuter);
+export const cmd = new Command(cmdData, cmdExecuter);

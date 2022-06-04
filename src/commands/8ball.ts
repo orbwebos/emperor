@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
+import { Command, EmbedTitle } from 'imperial-discord';
 import { ConfigManager } from '../util/config_manager';
-import { EmperorCommand } from '../emperor/command';
-import { EmperorTitle } from '../emperor/title';
 import { eightBall } from '../util/fun';
 import { Replier } from '../util/sender_replier';
 import { truncateString } from '../util/string_utils';
@@ -26,9 +25,9 @@ const cmdData = new SlashCommandBuilder()
       )
   );
 
-const cmdExecuter = async (i: CommandInteraction) => {
+const cmdExecuter = async (interaction: CommandInteraction) => {
   const question: string = truncateString(
-    i.options
+    interaction.options
       .getString('question')
       .replace(/\*/g, '')
       .replace(/_/g, '')
@@ -36,9 +35,9 @@ const cmdExecuter = async (i: CommandInteraction) => {
       .replace(/> /g, '>'),
     130
   );
-  const invisible: boolean = !!i.options.getBoolean('invisible');
-  const title = new EmperorTitle(i);
-  const replier = new Replier(i);
+  const invisible: boolean = !!interaction.options.getBoolean('invisible');
+  const title = new EmbedTitle(interaction);
+  const replier = new Replier(interaction);
 
   try {
     if (!question) {
@@ -59,4 +58,4 @@ const cmdExecuter = async (i: CommandInteraction) => {
   }
 };
 
-export const cmd = new EmperorCommand(cmdData, cmdExecuter);
+export const cmd = new Command(cmdData, cmdExecuter);

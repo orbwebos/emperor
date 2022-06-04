@@ -1,5 +1,5 @@
 import { Message, ReplyMessageOptions } from 'discord.js';
-import { EmperorEmbedder } from '../emperor/embedder';
+import { Embedder } from '../util/embedder';
 import { levenshteinMatches } from '../util/levenshtein';
 import { ConfigManager } from '../util/config_manager';
 import { truncateString } from '../util/string_utils';
@@ -65,10 +65,7 @@ export function analyzeFilterProcess(
         1850
       );
 
-  const embedder = new EmperorEmbedder(m.author);
-  const embed = embedder.emperorEmbed(
-    'Filter analysis is complete',
-    matchedString
-  );
+  const embedder = new Embedder(m.author);
+  const embed = embedder.embed('Filter analysis is complete', matchedString);
   return m.reply({ embeds: [embed] } as ReplyMessageOptions);
 }

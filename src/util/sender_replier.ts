@@ -8,10 +8,10 @@ import {
 } from 'discord.js';
 import * as schedule from 'node-schedule';
 import { randomBytes } from 'crypto';
-import { EmperorEmbedder } from '../emperor/embedder';
+import { Embedder } from './embedder';
 import * as log from './logging';
 
-export class Sender extends EmperorEmbedder {
+export class Sender extends Embedder {
   client: any;
   guild: any;
   channel: any;
@@ -31,7 +31,7 @@ export class Sender extends EmperorEmbedder {
   }
 
   send(title: string, body: string, contentPayload?: string): void {
-    const embed = this.emperorEmbed(title, body, this.color);
+    const embed = this.embed(title, body, this.color);
     if (contentPayload && contentPayload !== '') {
       this.channel.send({ embeds: [embed], content: contentPayload });
     } else {
@@ -46,8 +46,8 @@ export class Sender extends EmperorEmbedder {
     body: string,
     contentPayload?: string
   ): void {
-    const embedder = new EmperorEmbedder(userName, userAvatarUrl);
-    const embed = embedder.emperorEmbed(title, body, this.color);
+    const embedder = new Embedder(userName, userAvatarUrl);
+    const embed = embedder.embed(title, body, this.color);
     if (contentPayload && contentPayload !== '') {
       this.channel.send({ embeds: [embed], content: contentPayload });
     } else {
@@ -56,7 +56,7 @@ export class Sender extends EmperorEmbedder {
   }
 }
 
-export class Replier extends EmperorEmbedder {
+export class Replier extends Embedder {
   interaction: any;
   color: ColorResolvable;
 
@@ -67,12 +67,12 @@ export class Replier extends EmperorEmbedder {
   }
 
   reply(title: string, body: string, ephemeral?: boolean): void {
-    const embed = this.emperorEmbed(title, body, this.color);
+    const embed = this.embed(title, body, this.color);
     this.interaction.reply({ embeds: [embed], ephemeral });
   }
 
   async editReply(title: string, body: string): Promise<any> {
-    const embed = this.emperorEmbed(title, body, this.color);
+    const embed = this.embed(title, body, this.color);
     return this.interaction.editReply({ embeds: [embed] });
   }
 
@@ -81,7 +81,7 @@ export class Replier extends EmperorEmbedder {
     body: string,
     component: any
   ): Promise<any> {
-    const embed = this.emperorEmbed(title, body, this.color);
+    const embed = this.embed(title, body, this.color);
     return this.interaction.editReply({
       embeds: [embed],
       components: [component],
@@ -89,7 +89,7 @@ export class Replier extends EmperorEmbedder {
   }
 
   async editReplyRemoveComponents(title: string, body: string): Promise<any> {
-    const embed = this.emperorEmbed(title, body, this.color);
+    const embed = this.embed(title, body, this.color);
     return this.interaction.editReply({ embeds: [embed], components: [] });
   }
 
@@ -102,7 +102,7 @@ export class Replier extends EmperorEmbedder {
     body: string,
     ephemeral?: boolean
   ): Promise<any> {
-    const embed = this.emperorEmbed(title, body, this.color);
+    const embed = this.embed(title, body, this.color);
     return this.interaction.followUp({
       embeds: [embed],
       ephemeral,
@@ -111,7 +111,7 @@ export class Replier extends EmperorEmbedder {
   }
 
   async followUpNonEphemeral(title: string, body: string): Promise<any> {
-    const embed = this.emperorEmbed(title, body, this.color);
+    const embed = this.embed(title, body, this.color);
     return this.interaction.followUp({
       embeds: [embed],
       ephemeral: false,
@@ -120,7 +120,7 @@ export class Replier extends EmperorEmbedder {
   }
 
   async followUpEphemeral(title: string, body: string): Promise<any> {
-    const embed = this.emperorEmbed(title, body, this.color);
+    const embed = this.embed(title, body, this.color);
     return this.interaction.followUp({
       embeds: [embed],
       ephemeral: true,
@@ -134,7 +134,7 @@ export class Replier extends EmperorEmbedder {
     component: any,
     ephemeral?: boolean
   ): Promise<any> {
-    const embed = this.emperorEmbed(title, body, this.color);
+    const embed = this.embed(title, body, this.color);
     return this.interaction.followUp({
       embeds: [embed],
       components: [component],
@@ -218,7 +218,7 @@ export class Retorter extends ExtendedReplier {
 
     const embeds: MessageEmbed[] = [];
     for (const i in embedPrepared) {
-      const embed = this.paginatedEmperorEmbed(
+      const embed = this.paginatedEmbed(
         title,
         embedPrepared[i],
         parseInt(i) + 1,
@@ -360,7 +360,7 @@ export class Retorter extends ExtendedReplier {
           }
         }
         text += '*Awaiting page input...*';
-        const awaitingPageInputEmbed = this.paginatedEmperorEmbed(
+        const awaitingPageInputEmbed = this.paginatedEmbed(
           title,
           text,
           currentPage + 1,

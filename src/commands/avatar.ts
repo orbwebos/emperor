@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { EmperorCommand } from '../emperor/command';
+import { CommandInteraction } from 'discord.js';
+import { Command } from 'imperial-discord';
 
 const cmdData = new SlashCommandBuilder()
   .setName('avatar')
@@ -10,10 +11,10 @@ const cmdData = new SlashCommandBuilder()
     option.setName('target').setDescription("The user's avatar to show")
   );
 
-const cmdExecuter = async (i) => {
-  const user = i.options.getUser('target');
+const cmdExecuter = async (interaction: CommandInteraction) => {
+  const user = interaction.options.getUser('target');
   if (user) {
-    return i.reply(
+    return interaction.reply(
       `${user.username}'s avatar: ${user.displayAvatarURL({
         format: 'png',
         size: 1024,
@@ -21,8 +22,8 @@ const cmdExecuter = async (i) => {
       })}`
     );
   }
-  return i.reply(
-    `Your avatar: ${i.user.displayAvatarURL({
+  return interaction.reply(
+    `Your avatar: ${interaction.user.displayAvatarURL({
       format: 'png',
       size: 1024,
       dynamic: true,
@@ -30,4 +31,4 @@ const cmdExecuter = async (i) => {
   );
 };
 
-export const cmd = new EmperorCommand(cmdData, cmdExecuter);
+export const cmd = new Command(cmdData, cmdExecuter);

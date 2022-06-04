@@ -1,13 +1,12 @@
-import { Interaction } from 'discord.js';
-import { EmperorEvent } from '../emperor/event';
-import { EmperorClient } from '../emperor/client';
+import { Client, Interaction } from 'discord.js';
+import { Handler } from 'imperial-discord';
 
-export default class InteractionCreateEvent extends EmperorEvent {
+export default class InteractionCreateHandler extends Handler {
   public constructor() {
     super('interactionCreate', false);
   }
 
-  public static async execute(interaction: Interaction, client: EmperorClient) {
+  public static async execute(interaction: Interaction, client: Client) {
     if (!interaction.isCommand()) {
       return;
     }

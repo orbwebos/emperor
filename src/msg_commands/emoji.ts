@@ -1,7 +1,6 @@
-import { Message, TextChannel } from 'discord.js';
+import { Client, Message, TextChannel } from 'discord.js';
 import { readdirSync } from 'fs';
-import { EmperorClient } from '../emperor/client';
-import { EmperorEmbedder } from '../emperor/embedder';
+import { Embedder } from '../util/embedder';
 import { ConfigManager } from '../util/config_manager';
 import { isInArray } from '../util/is_in';
 import * as log from '../util/logging';
@@ -18,7 +17,7 @@ const emojiMatches = (content: string): RegExpMatchArray =>
   content.match(regex);
 
 export async function emojiProcess(
-  client: EmperorClient,
+  client: Client,
   message: Message
 ): Promise<void> {
   if (
@@ -127,10 +126,10 @@ export async function emojiProcess(
           const repliedMessage = await (referenceChannel as any).messages.fetch(
             message.reference.messageId
           );
-          const embedder = new EmperorEmbedder(repliedMessage.author);
+          const embedder = new Embedder(repliedMessage.author);
           const messageLink = `https://discord.com/channels/${message.reference.guildId}/${message.reference.channelId}/${message.reference.messageId}`;
 
-          const embed = embedder.emperorEmbed(
+          const embed = embedder.embed(
             '',
             `${truncateString(
               repliedMessage.content,
