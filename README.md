@@ -5,24 +5,33 @@ further features aren't guaranteed.
 
 ## Running
 
-```
-cp -r examples/config config
+Create `.imperialrc` in the root directory, with at least these fields:
+
+```json
+{
+    "name": "Emperor",
+    "name_possessive": "Emperor's",
+    "version": "0.1.0",
+    "owner_ids": ["123456789012345678"],
+    "logging": {
+        "guild": "123456789012345678",
+        "channel": "123456789012345678"
+    }
+}
 ```
 
-Modify the `.env` file in the configuration folder so that it contains your
-actual bot's token. Then, fill the relevant fields in the `config/bot.json`
-file. I suggest you also look into the other files in the folder. Finally:
+Create `.env` similarly:
+
+```
+BOT_TOKEN=YOUR_TOKEN
+```
+
+Finally:
 
 ```
 npm i
 npm start
 ```
-
-## Slash commands
-
-To use Emperor, you'll need to register its slash commands.
-`examples/slash_update.ts` is an example script that registers the commands on a
-single guild. Registering them globally is probably preferable.
 
 ## License
 

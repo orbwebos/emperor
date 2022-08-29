@@ -1,34 +1,39 @@
-import { Client, Message, TextChannel } from 'discord.js';
+import { DMChannel, Message, TextChannel } from 'discord.js';
 import { readdirSync } from 'fs';
-import { Embedder } from '../util/embedder';
-import { ConfigManager } from '../util/config_manager';
-import { isInArray } from '../util/is_in';
-import * as log from '../util/logging';
-import { resolvePathFromSource } from '../util/resolve_path';
-import { truncateString } from '../util/string_utils';
-
-const config = new ConfigManager();
+import { Command } from 'imperial-discord';
+import { Embedder } from '../../util/embedder';
+import { isInArray } from '../../util/is_in';
+import { resolvePathFromSource } from '../../util/resolve_path';
+import { truncateString } from '../../util/string_utils';
+import { config } from '../../util/config_manager';
 
 const regex = /(?<!<|<a|\\):\w\w+:/gi;
-
 const includesEmojiKey = (content: string): boolean => regex.test(content);
-
 const emojiMatches = (content: string): RegExpMatchArray =>
   content.match(regex);
 
-export async function emojiProcess(
-  client: Client,
-  message: Message
-): Promise<void> {
-  if (
-    !isInArray(
-      readdirSync(resolvePathFromSource(`../data/emoji_blacklist`)),
-      message.author.id
-    ) &&
-    config.general.emoji_service_guilds_blacklist.includes(message.guildId) ===
-      false &&
-    includesEmojiKey(message.content)
-  ) {
+export class EmojiServiceActionCommand extends Command {
+  public registerMessageCallback(message: Message) {
+    if (message.channel instanceof DMChannel) {
+      return false;
+    }
+
+    if (
+      !isInArray(
+        readdirSync(resolvePathFromSource(`../data/emoji_blacklist`)),
+        message.author.id
+      ) &&
+      config.general.emojiServiceGuildsBlacklist.includes(message.guildId) ===
+        false &&
+      includesEmojiKey(message.content)
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public async messageExecute(message: Message) {
     const matches = emojiMatches(message.content);
     let successfulReplacement = false;
     let workingContent = message.content;
@@ -43,7 +48,7 @@ export async function emojiProcess(
           '976579670478848010',
         ];
         const isIrlServer = (s: string) => isInArray(irlServers, s);
-        const emoji = client.emojiStore.find(
+        const emoji = message.client.emojiStore.find(
           (foundEmoji) =>
             // name must match and it must not be true that the emoji comes from an IRL server
             // while the destination is not an IRL server
@@ -90,21 +95,19 @@ export async function emojiProcess(
             foundWebhook.name === `${config.bot.name} Emoji Service`
         );
         if (!webhook) {
-          log.debug(
+          this.logger.debug(
             `Creating new ${config.bot.name} Emoji Service webhook in ${channel.id}...`
           );
-          webhook = await channel.createWebhook(
-            `${config.bot.name} Emoji Service`,
-            {
-              avatar: config.general.emoji_service_webhook_avatar_url,
-            }
-          );
+          webhook = await channel.createWebhook({
+            name: `${config.bot.name} Emoji Service`,
+            avatar: config.general.emojiServiceWebhookAvatarUrl,
+          });
         }
 
         try {
           await message.delete();
         } catch (e) {
-          log.debug(`Couldn't delete message ${message.id}: ${e}`);
+          this.logger.debug(`Couldn't delete message ${message.id}: ${e}`);
         }
 
         const name = message.member.nickname
@@ -120,7 +123,7 @@ export async function emojiProcess(
               )} **(character limit reached)**`;
 
         if (message.reference !== null) {
-          const referenceChannel = await client.channels.fetch(
+          const referenceChannel = await message.client.channels.fetch(
             message.channelId
           );
           const repliedMessage = await (referenceChannel as any).messages.fetch(
@@ -140,16 +143,14 @@ export async function emojiProcess(
           await webhook.send({
             content: toSend,
             username: name,
-            avatarURL: message.member.displayAvatarURL({
-              dynamic: true,
-            }),
+            avatarURL: message.member.displayAvatarURL(),
             embeds: [embed],
           });
         } else {
           await webhook.send({
             content: toSend,
             username: name,
-            avatarURL: message.member.displayAvatarURL({ dynamic: true }),
+            avatarURL: message.member.displayAvatarURL(),
           });
         }
       }

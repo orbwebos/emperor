@@ -4,41 +4,29 @@ import {
   SlashCommandBuilder,
 } from 'discord.js';
 import { Command, EmbedTitle, Replier } from 'imperial-discord';
-import { dotPrefixed } from '../util/dot_prefixed';
-import { config } from '../util/config_manager';
+import { config } from '../../util/config_manager';
+import { dotPrefixed } from '../../util/dot_prefixed';
 
-export class YoutubeCommand extends Command {
+export class EightBallCommand extends Command {
   public constructor() {
-    super({
-      description:
-        'Replies with an invite link to a YouTube Together activity.',
-    });
+    super({ description: 'Sends a game of minesweeper.' });
   }
 
   public registerApplicationCommand() {
     return new SlashCommandBuilder()
-      .setName('youtube')
-      .setDescription(
-        'Replies with an invite link to a YouTube Together activity.'
-      )
+      .setName('minesweeper')
+      .setDescription('Sends a game of minesweeper.')
       .addBooleanOption((option) =>
         option
           .setName('invisible')
           .setDescription(
-            `If true, only you will see ${config.bot.possessiveName} response. Default: false.`
+            `If true, only you will see ${config.bot.name_possessive} response. Default: false.`
           )
       );
   }
 
-  public registerMessageCallback(message: Message) {
-    return dotPrefixed(
-      message.content,
-      'youtube-together',
-      'youtube_together',
-      'youtubetogether',
-      'youtube',
-      'yt'
-    );
+  public registerMessageCallback(message: Message): boolean {
+    return dotPrefixed(message.content, 'minesweeper');
   }
 
   public chatInputExecute(interaction: ChatInputCommandInteraction) {
@@ -49,7 +37,7 @@ export class YoutubeCommand extends Command {
     );
   }
 
-  public messageExecute(message: Message) {
+  public async messageExecute(message: Message) {
     return new Replier(message).embedReply(
       new EmbedTitle(this).response,
       'This command is in construction.'

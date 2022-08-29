@@ -3,23 +3,22 @@ import {
   Message,
   SlashCommandBuilder,
 } from 'discord.js';
-import { Command, EmbedTitle, Replier } from 'imperial-discord';
+import { Command } from 'imperial-discord';
 import { dotPrefixed } from '../util/dot_prefixed';
 import { config } from '../util/config_manager';
 
-export class YoutubeCommand extends Command {
+export class OnlineCommand extends Command {
   public constructor() {
     super({
-      description:
-        'Replies with an invite link to a YouTube Together activity.',
+      description: `Tells you whether ${config.bot.name} is online. The simplest possible command.`,
     });
   }
 
   public registerApplicationCommand() {
     return new SlashCommandBuilder()
-      .setName('youtube')
+      .setName('online')
       .setDescription(
-        'Replies with an invite link to a YouTube Together activity.'
+        `Tells you whether Emperor is online. The simplest possible command.`
       )
       .addBooleanOption((option) =>
         option
@@ -31,28 +30,19 @@ export class YoutubeCommand extends Command {
   }
 
   public registerMessageCallback(message: Message) {
-    return dotPrefixed(
-      message.content,
-      'youtube-together',
-      'youtube_together',
-      'youtubetogether',
-      'youtube',
-      'yt'
-    );
+    return dotPrefixed(message.content, 'online');
   }
 
   public chatInputExecute(interaction: ChatInputCommandInteraction) {
-    return new Replier(interaction).embedReply(
-      new EmbedTitle(this).response,
-      'This command is in construction.',
-      Boolean(interaction.options.getBoolean('invisible'))
-    );
+    return interaction.reply({
+      content: 'Emperor is online, receiving messages and replying properly.',
+      ephemeral: Boolean(interaction.options.getBoolean('invisible')),
+    });
   }
 
   public messageExecute(message: Message) {
-    return new Replier(message).embedReply(
-      new EmbedTitle(this).response,
-      'This command is in construction.'
+    return message.reply(
+      'Emperor is online, receiving messages and replying properly.'
     );
   }
 }

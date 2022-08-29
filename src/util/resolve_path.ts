@@ -1,5 +1,5 @@
-import * as path from 'path';
+import { join } from 'path';
 
 export function resolvePathFromSource(inputPath: string): string {
-  return path.join(__dirname, '..', inputPath);
+  return join(__dirname, '..', inputPath);
 }

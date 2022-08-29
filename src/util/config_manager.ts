@@ -1,25 +1,54 @@
 import { StateManager } from './state_manager';
+import { snakeCaseToCamelCase } from './string_utils';
 
-export type Secrets = {
+export interface ClientSecrets {
   botToken: string;
-};
+}
 
 export class ConfigManager {
-  public readonly secrets: Secrets;
-  public readonly bot: any;
-  public readonly general: any;
+  public readonly secrets: ClientSecrets;
+  public bot: any;
+  public general: any;
+  public wordFilterConfig: any;
 
-  constructor() {
+  public constructor() {
+    this.bot = {};
     this.secrets = {
       botToken: process.env.BOT_TOKEN,
     };
-    const botManager = new StateManager('../config/bot.json');
-    const generalManager = new StateManager('../config/general.json');
-    this.bot = botManager.readSync();
-    this.general = generalManager.readSync();
+
+    const rawConfig = new StateManager('../.imperialrc').readSync();
+
+    Object.entries(rawConfig).forEach(([key, value]) => {
+      switch (key) {
+        case 'custom.general': {
+          const general = {};
+          Object.entries(value).forEach(([key2, value2]) => {
+            general[snakeCaseToCamelCase(key2)] = value2;
+          });
+          this.general = general;
+          break;
+        }
+        case 'custom.word_filter': {
+          const wordFilterConf = {};
+          Object.entries(value).forEach(([key2, value2]) => {
+            wordFilterConf[snakeCaseToCamelCase(key2)] = value2;
+          });
+          this.wordFilterConfig = wordFilterConf;
+          break;
+        }
+        case 'name_possessive':
+          this.bot.possessiveName = value;
+          break;
+        default:
+          this.bot[snakeCaseToCamelCase(key)] = value;
+      }
+    });
   }
 
-  wordFilter() {
-    return new StateManager('../config/word_filter.json').readSync();
+  public wordFilter() {
+    return this.wordFilterConfig;
   }
 }
+
+export const config = new ConfigManager();

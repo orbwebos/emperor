@@ -1,3 +1,5 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
 import { ConfigManager } from './config_manager';
 
 const wfConfig = new ConfigManager().wordFilter();
@@ -12,24 +14,25 @@ export function levenshteinDistance(a: string, b: string): number {
   let j: number;
   let prev: number;
   let val: number;
-  let row: any[];
   // swap to save some memory O(min(a,b)) instead of O(a)
   if (a.length > b.length) {
     tmp = a;
+    // eslint-disable-next-line no-param-reassign
     a = b;
+    // eslint-disable-next-line no-param-reassign
     b = tmp;
   }
 
-  row = Array(a.length + 1);
+  const row = Array(a.length + 1);
   // init the row
-  for (i = 0; i <= a.length; i++) {
+  for (i = 0; i <= a.length; i += 1) {
     row[i] = i;
   }
 
   // fill in the rest
-  for (i = 1; i <= b.length; i++) {
+  for (i = 1; i <= b.length; i += 1) {
     prev = i;
-    for (j = 1; j <= a.length; j++) {
+    for (j = 1; j <= a.length; j += 1) {
       if (b[i - 1] === a[j - 1]) {
         val = row[j - 1]; // match
       } else {
@@ -49,56 +52,58 @@ export function levenshteinDistance(a: string, b: string): number {
   return row[a.length];
 }
 
-export function levenshteinInThreshold(
+const levenshteinInThreshold = (
   threshold: number,
   a: string,
   b: string
-): boolean {
-  return levenshteinDistance(a, b) <= threshold;
-}
+): boolean => levenshteinDistance(a, b) <= threshold;
 
 function excepted(s: string): boolean {
-  for (const excep of wfConfig.exceptions) {
-    const r = new RegExp(excep);
-    if (r.test(s)) return true;
-  }
-  return false;
+  return (wfConfig.exceptions as string[]).some((excep) =>
+    new RegExp(excep).test(s)
+  );
+}
+
+// fix this typing mess
+
+type levenshteinTuple = {
+  used: string;
+  original: string;
+};
+
+export type LevenshteinResult = {
+  matched: boolean;
+  reference: levenshteinTuple;
+  input: levenshteinTuple;
+};
+
+export interface LevenshteinOptions {
+  filteredWords: string[];
+  text: string;
+  threshold?: number;
+  lookahead?: number;
+  referenceRules?: ((s: string) => string)[];
+  inputRules?: ((s: string) => string)[];
 }
 
 export function levenshteinMatches(
-  list: string[],
-  s: string,
-  threshold?: number,
-  lookahead?: number,
-  referenceRules?: ((s: string) => string)[],
-  inputRules?: ((s: string) => string)[]
-): {
-  matched: boolean;
-  reference: { used: string; original: string };
-  input: { used: string; original: string };
-} {
-  if (!threshold) {
-    threshold = 2;
-  }
-  if (!lookahead) {
-    lookahead = 3;
-  }
-  if (!referenceRules) {
-    referenceRules = [];
-  }
-  if (!inputRules) {
-    inputRules = [];
-  }
+  options: LevenshteinOptions
+): LevenshteinResult {
+  const threshold = options.threshold ?? 2;
+  const lookahead = options.threshold ?? 3;
+  const referenceRules = options.referenceRules ?? [];
+  const inputRules = options.inputRules ?? [];
 
-  const split = s.split(/[\n\r\s]+/);
-  for (const i in list) {
+  const split = options.text.split(/[\n\r\s]+/);
+
+  for (const word of options.filteredWords) {
     for (const j in split) {
-      for (let k = 0; k <= lookahead; k++) {
-        const refphrase = list[i];
+      for (let k = 0; k <= lookahead; k += 1) {
+        const refphrase = word;
         let bufphrase = split[j];
-        for (let a = 1; a <= k; a++) {
-          if (parseInt(j) + a < split.length) {
-            bufphrase += ` ${split[(parseInt(j) + a).toString()]}`;
+        for (let a = 1; a <= k; a += 1) {
+          if (parseInt(j, 10) + a < split.length) {
+            bufphrase += ` ${split[(parseInt(j, 10) + a).toString()]}`;
           }
         }
         if (referenceRules.length) {
@@ -114,22 +119,36 @@ export function levenshteinMatches(
                     bufphraseMod
                   ) &&
                   !excepted(bufphraseMod)
-                )
+                ) {
                   return {
                     matched: true,
-                    reference: { used: refphraseMod, original: list[i] },
-                    input: { used: bufphraseMod, original: s },
+                    reference: {
+                      used: refphraseMod,
+                      original: word,
+                    },
+                    input: {
+                      used: bufphraseMod,
+                      original: options.text,
+                    },
                   };
+                }
               }
             } else if (
               levenshteinInThreshold(threshold, refphraseMod, bufphrase) &&
               !excepted(bufphrase)
-            )
+            ) {
               return {
                 matched: true,
-                reference: { used: refphraseMod, original: list[i] },
-                input: { used: bufphrase, original: s },
+                reference: {
+                  used: refphraseMod,
+                  original: word,
+                },
+                input: {
+                  used: bufphrase,
+                  original: options.text,
+                },
               };
+            }
           }
         } else if (inputRules.length) {
           for (const l in inputRules) {
@@ -137,29 +156,49 @@ export function levenshteinMatches(
             if (
               levenshteinInThreshold(threshold, refphrase, bufphraseMod) &&
               !excepted(bufphraseMod)
-            )
+            ) {
               return {
                 matched: true,
-                reference: { used: refphrase, original: list[i] },
-                input: { used: bufphraseMod, original: s },
+                reference: {
+                  used: refphrase,
+                  original: word,
+                },
+                input: {
+                  used: bufphraseMod,
+                  original: options.text,
+                },
               };
+            }
           }
         } else if (
           levenshteinInThreshold(threshold, refphrase, bufphrase) &&
           !excepted(bufphrase)
-        )
+        ) {
           return {
             matched: true,
-            reference: { used: refphrase, original: list[i] },
-            input: { used: bufphrase, original: s },
+            reference: {
+              used: refphrase,
+              original: word,
+            },
+            input: {
+              used: bufphrase,
+              original: options.text,
+            },
           };
+        }
       }
     }
   }
 
   return {
     matched: false,
-    reference: { used: '', original: '' },
-    input: { used: '', original: s },
+    reference: {
+      used: '',
+      original: '',
+    },
+    input: {
+      used: '',
+      original: options.text,
+    },
   };
 }

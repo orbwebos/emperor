@@ -1,4 +1,4 @@
-import { ColorResolvable, User, MessageEmbed } from 'discord.js';
+import { ColorResolvable, User, EmbedBuilder } from 'discord.js';
 import { ConfigManager } from './config_manager';
 
 const config = new ConfigManager();
@@ -14,16 +14,15 @@ export class Embedder {
 
     this.username = user instanceof User ? user.tag : user;
 
-    this.userAvatarUrl =
-      avatarUser || (user as User).displayAvatarURL({ dynamic: true });
+    this.userAvatarUrl = avatarUser || (user as User).displayAvatarURL();
   }
 
   public embed(
     title: string,
     text: string,
     color: ColorResolvable = '#7850bd'
-  ): MessageEmbed {
-    return new MessageEmbed()
+  ): EmbedBuilder {
+    return new EmbedBuilder()
       .setColor(color)
       .setTitle(title)
       .setAuthor({
@@ -43,8 +42,8 @@ export class Embedder {
     currentPage: number,
     totalPages: number,
     color: ColorResolvable = '#7850bd'
-  ): MessageEmbed {
-    return new MessageEmbed()
+  ): EmbedBuilder {
+    return new EmbedBuilder()
       .setColor(color)
       .setTitle(title)
       .setAuthor({

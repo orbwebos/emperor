@@ -1,5 +1,6 @@
 node_modules/
-config/
+.imperialrc
+.env
 data/
 scripts/
 dist/

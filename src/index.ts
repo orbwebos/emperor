@@ -1,23 +1,23 @@
-import { Intents } from 'discord.js';
-import { ImperialClient } from 'imperial-discord';
-import { ConfigManager } from './util/config_manager';
-import { resolvePathFromSource } from './util/resolve_path';
+import { GatewayIntentBits } from 'discord.js';
+import { Imperial } from 'imperial-discord';
+import { config } from './util/config_manager';
+import { EmperorLogger } from './util/logger';
 
-const client = new ImperialClient({
+Imperial.start({
   intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-    Intents.FLAGS.GUILD_VOICE_STATES,
-    Intents.FLAGS.DIRECT_MESSAGES,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildVoiceStates,
+    GatewayIntentBits.DirectMessages,
   ],
-  logger: {
-    name: 'Emperor',
-    level: 'debug',
+  logger: new EmperorLogger({ name: 'Emperor', level: 'debug' }),
+  token: config.secrets.botToken,
+  name: config.bot.name,
+  version: config.bot.version,
+  defaultHandlers: {
+    ready: false,
+    messageCreate: false,
   },
 });
-
-client.setupCommands(resolvePathFromSource('./commands'));
-client.setupHandlers(resolvePathFromSource('./handlers'));
-
-client.login(new ConfigManager().secrets.botToken);

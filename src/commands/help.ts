@@ -4,22 +4,21 @@ import {
   SlashCommandBuilder,
 } from 'discord.js';
 import { Command, EmbedTitle, Replier } from 'imperial-discord';
-import { dotPrefixed } from '../util/dot_prefixed';
 import { config } from '../util/config_manager';
+import { dotPrefixed } from '../util/dot_prefixed';
 
-export class YoutubeCommand extends Command {
+export class HelpCommand extends Command {
   public constructor() {
     super({
-      description:
-        'Replies with an invite link to a YouTube Together activity.',
+      description: `Displays information about ${config.bot.possessiveName} commands.`,
     });
   }
 
   public registerApplicationCommand() {
     return new SlashCommandBuilder()
-      .setName('youtube')
+      .setName('help')
       .setDescription(
-        'Replies with an invite link to a YouTube Together activity.'
+        `Displays information about ${config.bot.possessiveName} commands.`
       )
       .addBooleanOption((option) =>
         option
@@ -31,28 +30,35 @@ export class YoutubeCommand extends Command {
   }
 
   public registerMessageCallback(message: Message) {
-    return dotPrefixed(
-      message.content,
-      'youtube-together',
-      'youtube_together',
-      'youtubetogether',
-      'youtube',
-      'yt'
-    );
+    return dotPrefixed(message.content, 'help');
   }
 
-  public chatInputExecute(interaction: ChatInputCommandInteraction) {
+  public getHelpText(): string {
+    let help = '';
+
+    this.client.commandStore.forEach((command, name) => {
+      help += `- **${name}`;
+      help +=
+        command.description === null || command.description === undefined
+          ? '**\n'
+          : `:** ${command.description}\n`;
+    });
+
+    return help;
+  }
+
+  public async chatInputExecute(interaction: ChatInputCommandInteraction) {
     return new Replier(interaction).embedReply(
       new EmbedTitle(this).response,
-      'This command is in construction.',
+      this.getHelpText(),
       Boolean(interaction.options.getBoolean('invisible'))
     );
   }
 
-  public messageExecute(message: Message) {
+  public async messageExecute(message: Message) {
     return new Replier(message).embedReply(
       new EmbedTitle(this).response,
-      'This command is in construction.'
+      this.getHelpText()
     );
   }
 }

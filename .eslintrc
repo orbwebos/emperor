@@ -12,13 +12,33 @@
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
     "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": ["error"],
+    "@typescript-eslint/no-unused-vars": [
+      "error"
+    ],
     "import/extensions": "off",
     "no-console": "off",
     "no-nested-ternary": "off",
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": "error",
     "import/prefer-default-export": "off",
+    "no-underscore-dangle": "off",
+    "no-redeclare": "off",
+    "@typescript-eslint/no-redeclare": [
+      "error"
+    ],
+    "class-methods-use-this": [
+      "off",
+      {
+        "exceptMethods": [
+          "execute",
+          "chatInputExecute",
+          "messageExecute",
+          "mixedExecute",
+          "messageContextMenuExecute",
+          "userContextMenuExecute"
+        ]
+      }
+    ],
     "lines-between-class-members": [
       "error",
       "always",
