@@ -4,7 +4,6 @@ module.exports = {
     script: './dist/index.js',
     watch: './dist',
     node_args: '-r dotenv/config',
-    args: ['dotenv_config_path=config/.env'],
   }],
 
   deploy: {
