@@ -7,7 +7,7 @@ import { Command, EmbedTitle, Replier } from 'imperial-discord';
 import { config } from '../../util/config_manager';
 import { dotPrefixed } from '../../util/dot_prefixed';
 
-export class EightBallCommand extends Command {
+export class MinesweeperCommand extends Command {
   public constructor() {
     super({ description: 'Sends a game of minesweeper.' });
   }
