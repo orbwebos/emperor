@@ -132,13 +132,12 @@ export class EmojiServiceActionCommand extends Command {
           const embedder = new Embedder(repliedMessage.author);
           const messageLink = `https://discord.com/channels/${message.reference.guildId}/${message.reference.channelId}/${message.reference.messageId}`;
 
-          const embed = embedder.embed(
-            '',
-            `${truncateString(
+          const embed = embedder.embed({
+            body: `${truncateString(
               repliedMessage.content,
               70
-            )}\n[Go to replied message](${messageLink})`
-          );
+            )}\n[Go to replied message](${messageLink})`,
+          });
 
           await webhook.send({
             content: toSend,
