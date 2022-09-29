@@ -10,7 +10,7 @@ export class MediaCheckActionCommand extends Command {
     });
   }
 
-  public registerMessageCallback(message: Message) {
+  public registerMessageTrigger(message: Message) {
     if (
       config.general.mediaChecker === true &&
       config.general.mediaCheckerGuildsWhitelist.includes(message.guildId) ===

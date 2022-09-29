@@ -1,36 +1,31 @@
-import {
-  ChatInputCommandInteraction,
-  Message,
-  SlashCommandBuilder,
-} from 'discord.js';
+import { ChatInputCommandInteraction, Message } from 'discord.js';
 import { BrandedEmbed, Command, EmbedTitle, Replier } from 'imperial-discord';
-import { dotPrefixed } from '../util/dot_prefixed';
 import { config } from '../util/config_manager';
+import { registerOptions } from '../util/registration';
 
 export class PingCommand extends Command {
   public constructor() {
     super({
       description: `Replies with statistics about ${config.bot.possessiveName} response.`,
+      register: registerOptions,
     });
   }
 
-  public registerApplicationCommand() {
-    return new SlashCommandBuilder()
-      .setName('ping')
-      .setDescription(
-        `Replies with statistics about ${config.bot.possessiveName} response.`
-      )
-      .addBooleanOption((option) =>
-        option
-          .setName('invisible')
-          .setDescription(
-            `If true, only you will see ${config.bot.possessiveName} response. Default: false.`
-          )
-      );
-  }
-
-  public registerMessageCallback(message: Message) {
-    return dotPrefixed(message.content, 'ping');
+  public registerApplicationCommands() {
+    this.registerChatInputCommand((builder) =>
+      builder
+        .setName('ping')
+        .setDescription(
+          `Replies with statistics about ${config.bot.possessiveName} response.`
+        )
+        .addBooleanOption((option) =>
+          option
+            .setName('invisible')
+            .setDescription(
+              `If true, only you will see ${config.bot.possessiveName} response. Default: false.`
+            )
+        )
+    );
   }
 
   public async chatInputExecute(interaction: ChatInputCommandInteraction) {

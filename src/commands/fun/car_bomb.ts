@@ -1,30 +1,31 @@
 import { addHours } from 'date-fns';
 import { Message } from 'discord.js';
-import { Command, Replier } from 'imperial-discord';
-import { dotPrefixed } from '../../util/dot_prefixed';
+import {
+  Command,
+  mustBeReply,
+  Replier,
+  variantsMessageTrigger,
+} from 'imperial-discord';
 import { getRepliedMessage } from '../../util/get_replied_message';
 import { config } from '../../util/config_manager';
 
 export class CarBombActionCommand extends Command {
   public constructor() {
-    super({ description: 'Plants a car bomb in a message of your choosing.' });
+    super({
+      description: 'Plants a car bomb in a message of your choosing.',
+      preconditions: [mustBeReply],
+    });
   }
 
-  public registerMessageCallback(message: Message) {
+  public registerMessageTrigger(message: Message) {
     return (
-      dotPrefixed(message.content, 'car-bomb', 'car_bomb', 'carbomb') &&
+      variantsMessageTrigger(message.content, 'car-bomb') &&
       config.general.carbombs === true &&
       config.general.carbombsGuildsWhitelist.includes(message.guildId) === true
     );
   }
 
   public async messageExecute(message: Message) {
-    if (message.reference === null) {
-      return message.reply(
-        'You need to reply to a message in order to plant a car bomb.'
-      );
-    }
-
     const replied = await getRepliedMessage(message);
 
     const randomIntFromInterval = (min: number, max: number) =>

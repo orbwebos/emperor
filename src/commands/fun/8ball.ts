@@ -1,49 +1,70 @@
+import { ChatInputCommandInteraction, Message } from 'discord.js';
 import {
-  ChatInputCommandInteraction,
-  Message,
-  SlashCommandBuilder,
-} from 'discord.js';
-import { Command, EmbedTitle, Replier } from 'imperial-discord';
-import { eightBall } from '../../util/fun';
-import { truncateString } from '../../util/string_utils';
+  Command,
+  EmbedTitle,
+  Replier,
+  variantsMessageTrigger,
+} from 'imperial-discord';
+import { truncateString } from '../../util/util';
 import { config } from '../../util/config_manager';
 import { getProvidedText } from '../../util/content';
-import { dotPrefixed } from '../../util/dot_prefixed';
+import { registerOptions } from '../../util/registration';
 
 export class EightBallCommand extends Command {
   public constructor() {
-    super({ description: 'Divines your luck.' });
+    super({ description: 'Divines your luck.', register: registerOptions });
   }
 
   public registerApplicationCommand() {
-    return new SlashCommandBuilder()
-      .setName('8ball')
-      .setDescription('Divine your luck.')
-      .addStringOption((option) =>
-        option
-          .setName('question')
-          .setDescription('Your question.')
-          .setRequired(true)
-      )
-      .addBooleanOption((option) =>
-        option
-          .setName('invisible')
-          .setDescription(
-            `If true, only you will see ${config.bot.name_possessive} response. Default: false.`
-          )
-      );
+    this.registerChatInputCommand((builder) =>
+      builder
+        .setName('8ball')
+        .setDescription('Divine your luck.')
+        .addStringOption((option) =>
+          option
+            .setName('question')
+            .setDescription('Your question.')
+            .setRequired(true)
+        )
+        .addBooleanOption((option) =>
+          option
+            .setName('invisible')
+            .setDescription(
+              `If true, only you will see ${config.bot.name_possessive} response. Default: false.`
+            )
+        )
+    );
   }
 
-  public registerMessageCallback(message: Message): boolean {
-    return dotPrefixed(
-      message.content,
-      '8ball',
-      '8-ball',
-      '8_ball',
-      'eightball',
-      'eight_ball',
-      'eight-ball'
-    );
+  public registerMessageTrigger(message: Message): boolean {
+    return variantsMessageTrigger(message.content, '8-ball', 'eight-ball');
+  }
+
+  private select() {
+    const answers = [
+      'It is certain.',
+      'It is decidedly so.',
+      'Without a doubt.',
+      'Yes definitely.',
+      'You may rely on it.',
+      'As I see it, yes.',
+      'Most likely.',
+      'Outlook good.',
+      'Yes.',
+      'Signs point to yes.',
+      'Reply hazy, try again.',
+      'Ask again later.',
+      'Better not tell you now.',
+      'Cannot predict now.',
+      'Concentrate and ask again.',
+      "Don't count on it.",
+      'My reply is no.',
+      'My sources say no.',
+      'Outlook not so good.',
+      'Very doubtful.',
+    ];
+
+    return answers[Math.floor(Math.random() * answers.length)];
   }
 
   public chatInputExecute(interaction: ChatInputCommandInteraction) {
@@ -70,7 +91,7 @@ export class EightBallCommand extends Command {
 
     return replier.embedReply(
       title.response,
-      `You asked:\n**${question}**\n\nYour luck is:\n**${eightBall()}**`,
+      `You asked:\n**${question}**\n\nYour luck is:\n**${this.select()}**`,
       invisible
     );
   }
@@ -99,7 +120,7 @@ export class EightBallCommand extends Command {
 
     return replier.embedReply(
       title.response,
-      `You asked:\n**${question}**\n\nYour luck is:\n**${eightBall()}**`
+      `You asked:\n**${question}**\n\nYour luck is:\n**${this.select()}**`
     );
   }
 }

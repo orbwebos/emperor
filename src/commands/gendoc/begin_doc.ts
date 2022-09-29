@@ -1,15 +1,10 @@
 import { readdirSync, writeFileSync } from 'fs';
 import { Message } from 'discord.js';
 import { Command } from 'imperial-discord';
-import { dotPrefixed } from '../../util/dot_prefixed';
 import { resolvePathFromSource } from '../../util/resolve_path';
 import { ensureDirectory } from '../../util/directory';
 
 export class BeginDocCommand extends Command {
-  public registerMessageCallback(message: Message) {
-    return dotPrefixed(message.content, 'begin-doc', 'begin_doc', 'begindoc');
-  }
-
   public async messageExecute(message: Message) {
     if (
       readdirSync(resolvePathFromSource('../data/gendoc')).includes(

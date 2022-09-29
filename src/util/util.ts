@@ -1,3 +1,7 @@
+export function prodOtherwise<T, U>(a: T, b: U): T | U {
+  return process.env.NODE_ENV === 'production' ? a : b;
+}
+
 /**
  * Truncate a string.
  *
@@ -10,15 +14,14 @@ export function truncateString(s: string, n: number): string {
 }
 
 export function snakeCaseToCamelCase(s: string): string {
-  return s
-    .split('_')
-    .reduce(
-      (res, word, i) =>
-        i === 0
-          ? word.toLowerCase()
-          : `${res}${word.charAt(0).toUpperCase()}${word
-              .slice(1)
-              .toLowerCase()}`,
-      ''
-    );
+  const split = s.split('_');
+  const first = split.shift();
+
+  const capitalized = split.map(
+    (str) => str.charAt(0).toUpperCase() + str.slice(1)
+  );
+
+  capitalized.unshift(first);
+
+  return capitalized.join('');
 }

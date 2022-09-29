@@ -1,19 +1,10 @@
 import { Message } from 'discord.js';
-import { Command } from 'imperial-discord';
-import { dotPrefixed } from '../../util/dot_prefixed';
+import { Command, variantsMessageTrigger } from 'imperial-discord';
 import { appendToGendocDocument } from '../../util/gendoc_append';
 
 export class NewParagraphCommand extends Command {
-  public registerMessageCallback(message: Message) {
-    return dotPrefixed(
-      message.content,
-      'new-paragraph',
-      'new_paragraph',
-      'newparagraph',
-      'new-par',
-      'new_par',
-      'newpar'
-    );
+  public registerMessageTrigger(message: Message) {
+    return variantsMessageTrigger(message.content, 'new-paragraph', 'new-par');
   }
 
   public async messageExecute(message: Message) {

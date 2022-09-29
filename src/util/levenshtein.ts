@@ -7,8 +7,14 @@ const wfConfig = new ConfigManager().wordFilter();
 // levenshtein distance implementation from:
 // https://gist.github.com/andrei-m/982927#gistcomment-1931258
 export function levenshteinDistance(a: string, b: string): number {
-  if (a.length === 0) return b.length;
-  if (b.length === 0) return a.length;
+  if (!a.length) {
+    return b.length;
+  }
+
+  if (!b.length) {
+    return a.length;
+  }
+
   let tmp: string;
   let i: number;
   let j: number;
@@ -32,23 +38,28 @@ export function levenshteinDistance(a: string, b: string): number {
   // fill in the rest
   for (i = 1; i <= b.length; i += 1) {
     prev = i;
+
     for (j = 1; j <= a.length; j += 1) {
       if (b[i - 1] === a[j - 1]) {
         val = row[j - 1]; // match
       } else {
         val = Math.min(
           row[j - 1] + 1, // substitution
+
           Math.min(
             prev + 1, // insertion
             row[j] + 1
           )
         ); // deletion
       }
+
       row[j - 1] = prev;
       prev = val;
     }
+
     row[a.length] = prev;
   }
+
   return row[a.length];
 }
 

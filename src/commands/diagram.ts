@@ -10,7 +10,6 @@ import { Command } from 'imperial-discord';
 import { v4 as uuidv4 } from 'uuid';
 import rimraf from 'rimraf';
 import { exec } from 'child_process';
-import { dotPrefixed } from '../util/dot_prefixed';
 import { ensureDirectory } from '../util/directory';
 import { resolvePathFromSource } from '../util/resolve_path';
 
@@ -20,10 +19,6 @@ export class DiagramCommand extends Command {
       description:
         'Generates [Mermaid](https://mermaid-js.github.io/) diagrams.',
     });
-  }
-
-  public registerMessageCallback(message: Message) {
-    return dotPrefixed(message.content, 'diagram');
   }
 
   public async messageExecute(message: Message) {

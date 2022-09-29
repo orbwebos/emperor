@@ -8,7 +8,7 @@ export class EmojiReactionActionCommand extends Command {
     super({ description: 'Ratios.' });
   }
 
-  public registerMessageCallback(message: Message) {
+  public registerMessageTrigger(message: Message) {
     if (message.reference === null) {
       return false;
     }

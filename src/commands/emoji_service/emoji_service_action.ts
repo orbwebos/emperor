@@ -1,11 +1,10 @@
 import { DMChannel, Message, TextChannel } from 'discord.js';
-import { readdirSync } from 'fs';
 import { Command } from 'imperial-discord';
 import { Embedder } from '../../util/embedder';
 import { isInArray } from '../../util/is_in';
-import { resolvePathFromSource } from '../../util/resolve_path';
-import { truncateString } from '../../util/string_utils';
+import { truncateString } from '../../util/util';
 import { config } from '../../util/config_manager';
+import { isInEmojiBlacklist } from '../../util/emoji_blacklist';
 
 const regex = /(?<!<|<a|\\):\w\w+:/gi;
 const includesEmojiKey = (content: string): boolean => regex.test(content);
@@ -13,16 +12,13 @@ const emojiMatches = (content: string): RegExpMatchArray =>
   content.match(regex);
 
 export class EmojiServiceActionCommand extends Command {
-  public registerMessageCallback(message: Message) {
+  public async registerMessageTrigger(message: Message) {
     if (message.channel instanceof DMChannel) {
       return false;
     }
 
     if (
-      !isInArray(
-        readdirSync(resolvePathFromSource(`../data/emoji_blacklist`)),
-        message.author.id
-      ) &&
+      !(await isInEmojiBlacklist(message.author.id)) &&
       config.general.emojiServiceGuildsBlacklist.includes(message.guildId) ===
         false &&
       includesEmojiKey(message.content)

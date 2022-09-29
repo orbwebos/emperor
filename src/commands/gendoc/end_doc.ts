@@ -9,15 +9,10 @@ import {
 import { Command } from 'imperial-discord';
 import rimraf from 'rimraf';
 import { exec } from 'child_process';
-import { dotPrefixed } from '../../util/dot_prefixed';
 import { resolvePathFromSource } from '../../util/resolve_path';
 import { config } from '../../util/config_manager';
 
 export class EndDocCommand extends Command {
-  public registerMessageCallback(message: Message) {
-    return dotPrefixed(message.content, 'end-doc', 'end_doc', 'enddoc');
-  }
-
   public async messageExecute(message: Message) {
     if (
       !readdirSync(resolvePathFromSource('../data/gendoc')).includes(

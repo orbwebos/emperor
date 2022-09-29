@@ -1,23 +1,16 @@
 import { Message } from 'discord.js';
-import { Command, Replier } from 'imperial-discord';
-import { dotPrefixed } from '../util/dot_prefixed';
-import { truncateString } from '../util/string_utils';
+import { Command, Replier, variantsMessageTrigger } from 'imperial-discord';
+import { truncateString } from '../util/util';
 import { runWordFilter } from '../util/word_filter';
 import { config } from '../util/config_manager';
 import { getProvidedText } from '../util/content';
 
 export const filterAnalysisTriggered = (message: Message) =>
-  dotPrefixed(
+  variantsMessageTrigger(
     message.content,
     'filter-analyze',
-    'filteranalyze',
-    'filter_analyze',
     'analyze-filter',
-    'analyzefilter',
-    'analyze_filter',
-    'filter-analysis',
-    'filteranalysis',
-    'filter_analysis'
+    'filter-analysis'
   );
 
 export class FilterAnalyzeCommand extends Command {
@@ -25,7 +18,7 @@ export class FilterAnalyzeCommand extends Command {
     super({ description: 'Runs filter analysis on a replied message.' });
   }
 
-  public registerMessageCallback(message: Message) {
+  public registerMessageTrigger(message: Message) {
     return filterAnalysisTriggered(message);
   }
 

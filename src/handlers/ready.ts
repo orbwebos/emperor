@@ -15,7 +15,5 @@ export class ReadyHandler extends Handler {
       await client.emojiStore.refresh();
       this.logger.debug('The emoji cache has been refreshed.');
     });
-
-    this.logger.info(`Ready. Logged in as ${client.user.tag}`);
   }
 }

@@ -1,40 +1,40 @@
+import { ChatInputCommandInteraction, Message } from 'discord.js';
 import {
-  ChatInputCommandInteraction,
-  Message,
-  SlashCommandBuilder,
-} from 'discord.js';
-import { Command, EmbedTitle, Replier } from 'imperial-discord';
+  Command,
+  EmbedTitle,
+  Replier,
+  variantsMessageTrigger,
+} from 'imperial-discord';
 import { ConfigManager } from '../util/config_manager';
-import { dotPrefixed } from '../util/dot_prefixed';
+import { registerOptions } from '../util/registration';
 
 export class ServerInfoCommand extends Command {
   public constructor() {
-    super({ description: 'Display information about this server.' });
+    super({
+      description: 'Display information about this server.',
+      register: registerOptions,
+    });
   }
 
-  public registerApplicationCommand() {
-    return new SlashCommandBuilder()
-      .setName('server-info')
-      .setDescription('Display information about this server.')
-      .addBooleanOption((option) =>
-        option
-          .setName('invisible')
-          .setDescription(
-            `If true, only you will see ${
-              new ConfigManager().bot.name_possessive
-            } response. Default: false.`
-          )
-      );
-  }
-
-  public registerMessageCallback(message: Message) {
-    return dotPrefixed(
-      message.content,
-      'server-info',
-      'server_info',
-      'serverinfo',
-      'svinfo'
+  public registerApplicationCommands() {
+    this.registerChatInputCommand((builder) =>
+      builder
+        .setName('server-info')
+        .setDescription('Display information about this server.')
+        .addBooleanOption((option) =>
+          option
+            .setName('invisible')
+            .setDescription(
+              `If true, only you will see ${
+                new ConfigManager().bot.name_possessive
+              } response. Default: false.`
+            )
+        )
     );
+  }
+
+  public registerMessageTrigger(message: Message) {
+    return variantsMessageTrigger(message.content, 'server-info', 'sv-info');
   }
 
   public chatInputExecute(interaction: ChatInputCommandInteraction) {

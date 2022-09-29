@@ -6,7 +6,7 @@ export class LovelyActionCommand extends Command {
     super({ description: 'Private server action.' });
   }
 
-  public registerMessageCallback(message: Message) {
+  public registerMessageTrigger(message: Message) {
     const lcc = message.content.toLowerCase();
     if (
       (lcc.includes('lovely') || lcc.includes('beloved')) &&

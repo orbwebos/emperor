@@ -12,7 +12,7 @@ export class WordFilterActionCommand extends Command {
     });
   }
 
-  public registerMessageCallback(message: Message) {
+  public registerMessageTrigger(message: Message) {
     if (filterAnalysisTriggered(message)) {
       return false;
     }

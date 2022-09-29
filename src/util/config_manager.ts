@@ -1,5 +1,6 @@
-import { StateManager } from './state_manager';
-import { snakeCaseToCamelCase } from './string_utils';
+import { readFileSync } from 'fs';
+import { resolvePathFromSource } from './resolve_path';
+import { snakeCaseToCamelCase } from './util';
 
 export interface ClientSecrets {
   botToken: string;
@@ -17,7 +18,8 @@ export class ConfigManager {
       botToken: process.env.BOT_TOKEN,
     };
 
-    const rawConfig = new StateManager('../.imperialrc').readSync();
+    const file = readFileSync(resolvePathFromSource('../.emperor.dev.json'));
+    const rawConfig = JSON.parse(file.toString());
 
     Object.entries(rawConfig).forEach(([key, value]) => {
       switch (key) {

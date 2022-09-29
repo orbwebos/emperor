@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS users (
+    user_id VARCHAR(255) PRIMARY KEY,
+    balance INTEGER DEFAULT 0 NOT NULL,
+    emoji_blacklisted BOOLEAN DEFAULT 0 NOT NULL
+)

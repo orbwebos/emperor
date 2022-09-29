@@ -1,15 +1,21 @@
-import { Client } from 'discord.js';
+import { Client, Message, MessagePayload, MessageOptions } from 'discord.js';
 
-export async function dm(
-  client: Client,
-  userId: string,
-  message: string
-): Promise<any> {
-  try {
-    const u = await client.users.fetch(userId);
-    // @ts-ignore: Property 'send' does not exist on type 'User'.
-    return await u.send({ content: message });
-  } catch (e) {
-    throw new Error(`couldn't DM user ${userId}: ${e}`);
-  }
+export interface MessageUserOptions {
+  client: Client;
+  userId: string;
+  payload: string | MessagePayload | MessageOptions;
+}
+
+/**
+ * Fetch a specified user based on their ID and send a message to them.
+ *
+ * @param options The options, which include the client, the ID, and the message.
+ * @returns A message promise.
+ */
+export async function messageUser(
+  options: MessageUserOptions
+): Promise<Message> {
+  const user = await options.client.users.fetch(options.userId);
+
+  return user.send(options.payload);
 }

@@ -1,6 +1,9 @@
 node_modules/
-.imperialrc
+.emperor*
+.imperial*
 .env
+db/
 data/
 scripts/
 dist/
+run_db*

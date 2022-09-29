@@ -1,7 +1,6 @@
 import { GatewayIntentBits } from 'discord.js';
 import { Imperial } from 'imperial-discord';
 import { config } from './util/config_manager';
-import { EmperorLogger } from './util/logger';
 
 Imperial.start({
   intents: [
@@ -12,12 +11,8 @@ Imperial.start({
     GatewayIntentBits.GuildVoiceStates,
     GatewayIntentBits.DirectMessages,
   ],
-  logger: new EmperorLogger({ name: 'Emperor', level: 'debug' }),
   token: config.secrets.botToken,
   name: config.bot.name,
   version: config.bot.version,
-  defaultHandlers: {
-    ready: false,
-    messageCreate: false,
-  },
+  ownerIds: config.bot.ownerIds,
 });

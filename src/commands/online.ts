@@ -1,36 +1,31 @@
-import {
-  ChatInputCommandInteraction,
-  Message,
-  SlashCommandBuilder,
-} from 'discord.js';
+import { ChatInputCommandInteraction, Message } from 'discord.js';
 import { Command } from 'imperial-discord';
-import { dotPrefixed } from '../util/dot_prefixed';
 import { config } from '../util/config_manager';
+import { registerOptions } from '../util/registration';
 
 export class OnlineCommand extends Command {
   public constructor() {
     super({
       description: `Tells you whether ${config.bot.name} is online. The simplest possible command.`,
+      register: registerOptions,
     });
   }
 
-  public registerApplicationCommand() {
-    return new SlashCommandBuilder()
-      .setName('online')
-      .setDescription(
-        `Tells you whether Emperor is online. The simplest possible command.`
-      )
-      .addBooleanOption((option) =>
-        option
-          .setName('invisible')
-          .setDescription(
-            `If true, only you will see ${config.bot.possessiveName} response. Default: false.`
-          )
-      );
-  }
-
-  public registerMessageCallback(message: Message) {
-    return dotPrefixed(message.content, 'online');
+  public registerApplicationCommands() {
+    this.registerChatInputCommand((builder) =>
+      builder
+        .setName('online')
+        .setDescription(
+          `Tells you whether Emperor is online. The simplest possible command.`
+        )
+        .addBooleanOption((option) =>
+          option
+            .setName('invisible')
+            .setDescription(
+              `If true, only you will see ${config.bot.possessiveName} response. Default: false.`
+            )
+        )
+    );
   }
 
   public chatInputExecute(interaction: ChatInputCommandInteraction) {

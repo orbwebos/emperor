@@ -6,7 +6,7 @@ export class JugarActionCommand extends Command {
     super({ description: 'Private server action.' });
   }
 
-  public registerMessageCallback(message: Message) {
+  public registerMessageTrigger(message: Message) {
     const jugarRegex = /quien \w+ jugar/gi;
 
     if (

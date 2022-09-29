@@ -1,10 +1,10 @@
 import { Message } from 'discord.js';
-import { writeFileSync } from 'fs';
 import { Command } from 'imperial-discord';
-import { ensureDirectory } from '../../util/directory';
-import { dotPrefixed } from '../../util/dot_prefixed';
-import { resolvePathFromSource } from '../../util/resolve_path';
 import { config } from '../../util/config_manager';
+import {
+  addToEmojiBlacklist,
+  isInEmojiBlacklist,
+} from '../../util/emoji_blacklist';
 
 export class EmojisOffCommand extends Command {
   public constructor() {
@@ -13,22 +13,16 @@ export class EmojisOffCommand extends Command {
     });
   }
 
-  public registerMessageCallback(message: Message) {
-    return dotPrefixed(
-      message.content,
-      'emojis-off',
-      'emojis_off',
-      'emojisoff'
-    );
-  }
+  public async messageExecute(message: Message) {
+    const { id } = message.author;
 
-  public messageExecute(message: Message) {
-    ensureDirectory(resolvePathFromSource(`../data/emoji_blacklist`));
+    if (await isInEmojiBlacklist(id)) {
+      return message.reply(
+        "It seems like you have already opted out of Emperor's emoji service."
+      );
+    }
 
-    writeFileSync(
-      resolvePathFromSource(`../data/emoji_blacklist/${message.author.id}`),
-      ''
-    );
+    await addToEmojiBlacklist(id);
 
     return message.reply("You have opted out of Emperor's emoji service.");
   }
