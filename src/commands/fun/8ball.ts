@@ -1,43 +1,27 @@
-import { ChatInputCommandInteraction, Message } from 'discord.js';
-import {
-  Command,
-  EmbedTitle,
-  Replier,
-  variantsMessageTrigger,
-} from 'imperial-discord';
-import { truncateString } from '../../util/util';
-import { config } from '../../util/config_manager';
-import { getProvidedText } from '../../util/content';
-import { registerOptions } from '../../util/registration';
+import { ApplyOptions } from '@sapphire/decorators';
+import { ApplicationCommandRegistry, Command } from '@sapphire/framework';
+import { Message } from 'discord.js';
+import { CommandHelper } from '../../lib/command_helper';
+import { getProvidedText } from '../../lib/content';
+import { invisibleOption } from '../../lib/invisible_option';
+import { truncateString } from '../../lib/util';
 
+@ApplyOptions<Command.Options>({ description: 'Divine your luck.' })
 export class EightBallCommand extends Command {
-  public constructor() {
-    super({ description: 'Divines your luck.', register: registerOptions });
-  }
-
-  public registerApplicationCommand() {
-    this.registerChatInputCommand((builder) =>
-      builder
-        .setName('8ball')
-        .setDescription('Divine your luck.')
-        .addStringOption((option) =>
-          option
-            .setName('question')
-            .setDescription('Your question.')
-            .setRequired(true)
-        )
-        .addBooleanOption((option) =>
-          option
-            .setName('invisible')
-            .setDescription(
-              `If true, only you will see ${config.bot.name_possessive} response. Default: false.`
-            )
-        )
+  public registerApplicationCommand(registry: ApplicationCommandRegistry) {
+    registry.registerChatInputCommand((builder) =>
+      invisibleOption(
+        builder
+          .setName('8ball')
+          .setDescription(this.description)
+          .addStringOption((option) =>
+            option
+              .setName('question')
+              .setDescription('Your question.')
+              .setRequired(true)
+          )
+      )
     );
-  }
-
-  public registerMessageTrigger(message: Message): boolean {
-    return variantsMessageTrigger(message.content, '8-ball', 'eight-ball');
   }
 
   private select() {
@@ -67,60 +51,51 @@ export class EightBallCommand extends Command {
     return answers[Math.floor(Math.random() * answers.length)];
   }
 
-  public chatInputExecute(interaction: ChatInputCommandInteraction) {
-    const question: string = truncateString(
-      interaction.options
-        .getString('question')
+  private getText(question: string) {
+    return `You asked:\n**${question}**\n\nYour luck is:\n**${this.select()}**`;
+  }
+
+  private sanitizeQuestion(question: string) {
+    return truncateString(
+      question
         .replace(/\*/g, '')
         .replace(/_/g, '')
         .replace(/~~/g, '')
         .replace(/> /g, '>'),
       130
-    );
-    const invisible = Boolean(interaction.options.getBoolean('invisible'));
-    const title = new EmbedTitle(this);
-    const replier = new Replier(interaction);
-
-    if (!question) {
-      return replier.embedReply(
-        title.error,
-        "You don't seem to have provided a valid question.",
-        invisible
-      );
-    }
-
-    return replier.embedReply(
-      title.response,
-      `You asked:\n**${question}**\n\nYour luck is:\n**${this.select()}**`,
-      invisible
     );
   }
 
-  public async messageExecute(message: Message) {
-    const text = await getProvidedText(message);
+  public chatInputRun(interaction: Command.ChatInputInteraction) {
+    const question = this.sanitizeQuestion(
+      interaction.options.getString('question')
+    );
 
-    const title = new EmbedTitle(this);
-    const replier = new Replier(message);
+    const helper = new CommandHelper(interaction, this);
 
-    if (!text) {
-      return replier.embedReply(
-        title.error,
-        "You don't seem to have provided a valid question."
-      );
+    return interaction.reply({
+      embeds: [helper.makeResponseEmbed(this.getText(question))],
+      ephemeral: helper.isInvisible(),
+    });
+  }
+
+  public async messageRun(message: Message) {
+    const question = this.sanitizeQuestion(await getProvidedText(message));
+
+    const helper = new CommandHelper(message, this);
+
+    if (!question) {
+      return message.reply({
+        embeds: [
+          helper.makeErrorEmbed(
+            "You don't seem to have provided a valid question."
+          ),
+        ],
+      });
     }
 
-    const question = truncateString(
-      text
-        .replace(/\*/g, '')
-        .replace(/_/g, '')
-        .replace(/~~/g, '')
-        .replace(/> /g, '>'),
-      130
-    );
-
-    return replier.embedReply(
-      title.response,
-      `You asked:\n**${question}**\n\nYour luck is:\n**${this.select()}**`
-    );
+    return message.reply({
+      embeds: [helper.makeResponseEmbed(this.getText(question))],
+    });
   }
 }

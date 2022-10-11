@@ -1,31 +1,16 @@
+import { ApplyOptions } from '@sapphire/decorators';
+import { Command } from '@sapphire/framework';
 import { addHours } from 'date-fns';
 import { Message } from 'discord.js';
-import {
-  Command,
-  mustBeReply,
-  Replier,
-  variantsMessageTrigger,
-} from 'imperial-discord';
-import { getRepliedMessage } from '../../util/get_replied_message';
-import { config } from '../../util/config_manager';
+import { CommandHelper } from '../../lib/command_helper';
+import { getRepliedMessage } from '../../lib/content';
 
-export class CarBombActionCommand extends Command {
-  public constructor() {
-    super({
-      description: 'Plants a car bomb in a message of your choosing.',
-      preconditions: [mustBeReply],
-    });
-  }
-
-  public registerMessageTrigger(message: Message) {
-    return (
-      variantsMessageTrigger(message.content, 'car-bomb') &&
-      config.general.carbombs === true &&
-      config.general.carbombsGuildsWhitelist.includes(message.guildId) === true
-    );
-  }
-
-  public async messageExecute(message: Message) {
+@ApplyOptions<Command.Options>({
+  description: 'Plants a car bomb in a message of your choosing.',
+  preconditions: ['MustBeReply'],
+})
+export class CarBombCommand extends Command {
+  public async messageRun(message: Message) {
     const replied = await getRepliedMessage(message);
 
     const randomIntFromInterval = (min: number, max: number) =>
@@ -40,9 +25,15 @@ export class CarBombActionCommand extends Command {
       replied.author.username
     }'s** car, and it will explode **<t:${timestamp.toString()}:R>** if left alone.`;
 
-    return new Replier(replied).embedReply(
-      '❗ A car bomb has been planted',
-      content
-    );
+    const helper = new CommandHelper(message, this);
+
+    return replied.reply({
+      embeds: [
+        helper.makeEmbed('❗ A car bomb has been planted', content, {
+          authorTag: replied.author.tag,
+          authorAvatarUrl: replied.author.displayAvatarURL(),
+        }),
+      ],
+    });
   }
 }

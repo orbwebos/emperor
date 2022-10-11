@@ -1,39 +1,27 @@
-import { ChatInputCommandInteraction, Message } from 'discord.js';
-import { Command, ownerExclusive } from 'imperial-discord';
-import { registerOptions } from '../../util/registration';
+import { ApplyOptions } from '@sapphire/decorators';
+import { ApplicationCommandRegistry, Command } from '@sapphire/framework';
+import { Message } from 'discord.js';
 
+@ApplyOptions<Command.Options>({
+  description:
+    'Refreshes the emoji cache. It automatically happens every 30 minutes.',
+  preconditions: ['OwnerExclusive'],
+})
 export class RefreshEmojiCacheCommand extends Command {
-  public constructor() {
-    super({
-      description:
-        'Owner-only. Refreshes the emoji cache. It automatically happens every 30 minutes.',
-      preconditions: [
-        ownerExclusive.addToMessage(
-          "You can ask this bot's owner to refresh the cache, or wait until it happens automatically (every 30 minutes.)"
-        ),
-      ],
-      register: registerOptions,
-    });
-  }
-
-  public registerApplicationCommands() {
-    this.registerChatInputCommand((builder) =>
-      builder
-        .setName('refresh-emoji-cache')
-        .setDescription(
-          'Owner-only. Refreshes the emoji cache. It automatically happens every 30 minutes.'
-        )
+  public registerApplicationCommands(registry: ApplicationCommandRegistry) {
+    registry.registerChatInputCommand((builder) =>
+      builder.setName('refresh-emoji-cache').setDescription(this.description)
     );
   }
 
-  public async chatInputExecute(interaction: ChatInputCommandInteraction) {
-    await interaction.client.emojiStore.refresh();
+  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+    await this.container.emojiManager.refresh();
 
     return interaction.reply('The emoji cache has been refreshed.');
   }
 
-  public async messageExecute(message: Message) {
-    await message.client.emojiStore.refresh();
+  public async messageRun(message: Message) {
+    await this.container.emojiManager.refresh();
 
     return message.reply('The emoji cache has been refreshed.');
   }

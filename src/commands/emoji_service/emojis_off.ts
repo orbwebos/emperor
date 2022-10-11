@@ -1,19 +1,16 @@
+import { ApplyOptions } from '@sapphire/decorators';
+import { Command, container } from '@sapphire/framework';
 import { Message } from 'discord.js';
-import { Command } from 'imperial-discord';
-import { config } from '../../util/config_manager';
 import {
   addToEmojiBlacklist,
   isInEmojiBlacklist,
-} from '../../util/emoji_blacklist';
+} from '../../lib/emoji_blacklist';
 
+@ApplyOptions<Command.Options>({
+  description: `Opts you out of ${container.config.bot.possessiveName} emoji service.`,
+})
 export class EmojisOffCommand extends Command {
-  public constructor() {
-    super({
-      description: `Opts you out of ${config.bot.possessiveName} emoji service.`,
-    });
-  }
-
-  public async messageExecute(message: Message) {
+  public async messageRun(message: Message) {
     const { id } = message.author;
 
     if (await isInEmojiBlacklist(id)) {

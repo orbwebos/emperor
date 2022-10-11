@@ -1,44 +1,36 @@
-import { ChatInputCommandInteraction, Message } from 'discord.js';
-import { Command, EmbedTitle, Replier } from 'imperial-discord';
-import { config } from '../../util/config_manager';
-import { isInEmojiBlacklist } from '../../util/emoji_blacklist';
-import { registerOptions } from '../../util/registration';
+import { ApplyOptions } from '@sapphire/decorators';
+import { ApplicationCommandRegistry, Command } from '@sapphire/framework';
+import { Message } from 'discord.js';
+import { isInEmojiBlacklist } from '../../lib/emoji_blacklist';
 
+@ApplyOptions<Command.Options>({
+  description: 'Tells you if you haz emojis.',
+})
 export class HazEmojisCommand extends Command {
-  public constructor() {
-    super({
-      description: 'Tells you if you haz emojis.',
-      register: registerOptions,
-    });
-  }
-
-  public registerApplicationCommands() {
-    this.registerChatInputCommand((builder) =>
+  public registerApplicationCommands(registry: ApplicationCommandRegistry) {
+    registry.registerChatInputCommand((builder) =>
       builder
         .setName('haz-emojis')
-        .setDescription(`Tells you if you haz emojis.`)
+        .setDescription(this.description)
         .addBooleanOption((option) =>
           option
             .setName('invisible')
             .setDescription(
-              `If true, only you will see ${config.bot.possessiveName} response. Default: false.`
+              `If true, only you will see ${this.container.config.bot.possessiveName} response. Default: false.`
             )
         )
     );
   }
 
-  public async chatInputExecute(interaction: ChatInputCommandInteraction) {
-    return new Replier(interaction).embedReply(
-      new EmbedTitle(this).response,
-      await this.responseText(interaction.user.id)
-    );
+  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+    return interaction.reply({
+      content: await this.responseText(interaction.user.id),
+      ephemeral: Boolean(interaction.options.getBoolean('invisible')),
+    });
   }
 
-  public async messageExecute(message: Message) {
-    return new Replier(message).embedReply(
-      new EmbedTitle(this).response,
-      await this.responseText(message.author.id)
-    );
+  public async messageRun(message: Message) {
+    return message.reply(await this.responseText(message.author.id));
   }
 
   private async responseText(id: string): Promise<string> {
