@@ -1,6 +1,8 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command, container } from '@sapphire/framework';
 import { Message } from 'discord.js';
+import { invisibleOption } from '../../lib/invisible_option';
+import { registerSwitch } from '../../lib/util';
 
 const { config } = container;
 
@@ -9,17 +11,18 @@ const { config } = container;
 })
 export class OnlineCommand extends Command {
   public override registerApplicationCommands(registry: Command.Registry) {
-    registry.registerChatInputCommand((builder) =>
-      builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addBooleanOption((option) =>
-          option
-            .setName('invisible')
-            .setDescription(
-              `If true, only you will see ${config.bot.possessiveName} response. Default: false.`
-            )
-        )
+    registry.registerChatInputCommand(
+      (builder) =>
+        invisibleOption(
+          builder.setName(this.name).setDescription(this.description)
+        ),
+      registerSwitch({
+        development: {
+          guildIds: ['906631270048624661'],
+          idHints: ['1029597692713766922'],
+        },
+        production: { idHints: ['1029606440811376700'] },
+      })
     );
   }
 

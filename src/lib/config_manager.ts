@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { resolvePathFromSource, snakeCaseToCamelCase } from './util';
+import { envSwitch, resolvePathFromSource, snakeCaseToCamelCase } from './util';
 
 export interface ClientSecrets {
   botToken: string;
@@ -13,11 +13,18 @@ export class ConfigManager {
 
   public constructor() {
     this.bot = {};
+
+    const mid = envSwitch({
+      development: 'dev',
+      testing: 'test',
+      production: 'prod',
+    });
+
     this.secrets = {
-      botToken: process.env.BOT_TOKEN,
+      botToken: process.env[`BOT_TOKEN_${mid.toUpperCase()}`],
     };
 
-    const file = readFileSync(resolvePathFromSource('../.emperor.dev.json'));
+    const file = readFileSync(resolvePathFromSource(`../.emperor.${mid}.json`));
     const rawConfig = JSON.parse(file.toString());
 
     Object.entries(rawConfig).forEach(([key, value]) => {

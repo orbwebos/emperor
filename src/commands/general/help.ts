@@ -7,6 +7,8 @@ import {
 } from '@sapphire/framework';
 import { Collection, Message } from 'discord.js';
 import { CommandHelper } from '../../lib/command_helper';
+import { invisibleOption } from '../../lib/invisible_option';
+import { registerSwitch } from '../../lib/util';
 
 const { config } = container;
 
@@ -15,19 +17,22 @@ const { config } = container;
 })
 export class HelpCommand extends Command {
   public registerApplicationCommands(registry: ApplicationCommandRegistry) {
-    registry.registerChatInputCommand((builder) =>
-      builder
-        .setName('help')
-        .setDescription(
-          `Displays information about ${config.bot.possessiveName} commands.`
-        )
-        .addBooleanOption((option) =>
-          option
-            .setName('invisible')
+    registry.registerChatInputCommand(
+      (builder) =>
+        invisibleOption(
+          builder
+            .setName('help')
             .setDescription(
-              `If true, only you will see ${config.bot.possessiveName} response. Default: false.`
+              `Displays information about ${config.bot.possessiveName} commands.`
             )
-        )
+        ),
+      registerSwitch({
+        development: {
+          guildIds: ['906631270048624661'],
+          idHints: ['1029597695079362652'],
+        },
+        production: { idHints: ['1029606442128388117'] },
+      })
     );
   }
 

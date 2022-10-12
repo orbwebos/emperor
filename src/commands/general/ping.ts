@@ -6,6 +6,7 @@ import {
 } from '@sapphire/framework';
 import { Message } from 'discord.js';
 import { CommandHelper } from '../../lib/command_helper';
+import { registerSwitch } from '../../lib/util';
 
 const { config } = container;
 
@@ -14,8 +15,15 @@ const { config } = container;
 })
 export class PingCommand extends Command {
   public registerApplicationCommands(registry: ApplicationCommandRegistry) {
-    registry.registerChatInputCommand((builder) =>
-      builder.setName('ping').setDescription(this.description)
+    registry.registerChatInputCommand(
+      (builder) => builder.setName('ping').setDescription(this.description),
+      registerSwitch({
+        development: {
+          guildIds: ['906631270048624661'],
+          idHints: ['1029597613479182396'],
+        },
+        production: { idHints: ['1029606357843845190'] },
+      })
     );
   }
 

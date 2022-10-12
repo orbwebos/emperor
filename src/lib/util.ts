@@ -1,13 +1,35 @@
 import { join } from 'path';
 import { appendFileSync, mkdirSync, readdirSync } from 'fs';
+import { ApplicationCommandRegistry } from '@sapphire/framework';
 
 export function ensureDirectory(directory: string): void {
   // @ts-ignore Argument of type '{ recursive: boolean; }' is not assignable to parameter of type 'string | number'.
   mkdirSync(directory, { recursive: true });
 }
 
-export function prodOtherwise<T, U>(a: T, b: U): T | U {
-  return process.env.NODE_ENV === 'production' ? a : b;
+export function envSwitch<T>(input: {
+  development?: T;
+  testing?: T;
+  production?: T;
+}): T {
+  switch (process.env.NODE_ENV?.toLowerCase()) {
+    case 'production':
+    case 'prod':
+      return input?.production ?? undefined;
+    case 'testing':
+    case 'test':
+      return input?.testing ?? undefined;
+    default:
+      return input?.development ?? undefined;
+  }
+}
+
+export function registerSwitch(input: {
+  development?: ApplicationCommandRegistry.RegisterOptions;
+  testing?: ApplicationCommandRegistry.RegisterOptions;
+  production?: ApplicationCommandRegistry.RegisterOptions;
+}) {
+  return envSwitch(input);
 }
 
 export function resolvePathFromSource(inputPath: string): string {

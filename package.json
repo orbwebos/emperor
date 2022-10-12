@@ -6,7 +6,8 @@
    "scripts": {
       "build": "rm -fr dist/* && tsc",
       "watch": "tsc -w",
-      "bot": "node -r dotenv/config dist/index.js | pino-pretty -c -t SYS:standard",
+      "bot": "node -r dotenv/config dist/index.js",
+      "prodbot": "NODE_ENV=production npm run bot",
       "start": "npm run build && npm run bot",
       "prodstart": "npm run build && NODE_ENV=production npm run bot",
       "db": "rm -f run_db.js && tsc run_db.ts && node run_db.js",

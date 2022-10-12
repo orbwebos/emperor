@@ -1,5 +1,10 @@
-import { LogLevel, SapphireClient } from '@sapphire/framework';
+import {
+  ClientLoggerOptions,
+  LogLevel,
+  SapphireClient,
+} from '@sapphire/framework';
 import { injectIntoContainer } from './lib/container';
+import { envSwitch } from './lib/util';
 
 const { config } = injectIntoContainer();
 
@@ -14,7 +19,10 @@ const client = new SapphireClient({
     'GUILD_VOICE_STATES',
     'DIRECT_MESSAGES',
   ],
-  logger: { level: LogLevel.Trace },
+  logger: envSwitch<ClientLoggerOptions>({
+    development: { level: LogLevel.Debug },
+    production: { level: LogLevel.Info },
+  }),
 });
 
 process.on('SIGINT', () => {

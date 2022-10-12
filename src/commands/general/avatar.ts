@@ -1,27 +1,45 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { ApplicationCommandRegistry, Command } from '@sapphire/framework';
 import { GuildMember } from 'discord.js';
+import { registerSwitch } from '../../lib/util';
 
 @ApplyOptions<Command.Options>({
   description: 'Get the avatar URL of the selected user, or your own avatar.',
 })
 export class AvatarCommand extends Command {
   public registerApplicationCommands(registry: ApplicationCommandRegistry) {
-    registry.registerChatInputCommand((builder) =>
-      builder
-        .setName('avatar')
-        .setDescription(
-          'Get the avatar URL of the selected user, or your own avatar.'
-        )
-        .addUserOption((option) =>
-          option.setName('target').setDescription("The user's avatar to show")
-        )
+    registry.registerChatInputCommand(
+      (builder) =>
+        builder
+          .setName('avatar')
+          .setDescription(
+            'Get the avatar URL of the selected user, or your own avatar.'
+          )
+          .addUserOption((option) =>
+            option.setName('target').setDescription("The user's avatar to show")
+          ),
+      registerSwitch({
+        development: {
+          guildIds: ['906631270048624661'],
+          idHints: ['1029597608773156904'],
+        },
+        production: { idHints: ['1029606355654414348'] },
+      })
     );
 
-    registry.registerContextMenuCommand({
-      name: 'Guild avatar',
-      type: 'USER',
-    });
+    registry.registerContextMenuCommand(
+      {
+        name: 'Guild avatar',
+        type: 'USER',
+      },
+      registerSwitch({
+        development: {
+          guildIds: ['906631270048624661'],
+          idHints: ['1029597611096817716'],
+        },
+        production: { idHints: ['1029606356916895804'] },
+      })
+    );
   }
 
   public async chatInputRun(interaction: Command.ChatInputInteraction) {

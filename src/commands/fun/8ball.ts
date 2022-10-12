@@ -4,23 +4,33 @@ import { Message } from 'discord.js';
 import { CommandHelper } from '../../lib/command_helper';
 import { getProvidedText } from '../../lib/content';
 import { invisibleOption } from '../../lib/invisible_option';
-import { truncateString } from '../../lib/util';
+import { registerSwitch, truncateString } from '../../lib/util';
 
-@ApplyOptions<Command.Options>({ description: 'Divine your luck.' })
+@ApplyOptions<Command.Options>({
+  description: 'Divine your luck.',
+})
 export class EightBallCommand extends Command {
-  public registerApplicationCommand(registry: ApplicationCommandRegistry) {
-    registry.registerChatInputCommand((builder) =>
-      invisibleOption(
-        builder
-          .setName('8ball')
-          .setDescription(this.description)
-          .addStringOption((option) =>
-            option
-              .setName('question')
-              .setDescription('Your question.')
-              .setRequired(true)
-          )
-      )
+  public registerApplicationCommands(registry: ApplicationCommandRegistry) {
+    registry.registerChatInputCommand(
+      (builder) =>
+        invisibleOption(
+          builder
+            .setName('8ball')
+            .setDescription(this.description)
+            .addStringOption((option) =>
+              option
+                .setName('question')
+                .setDescription('Your question.')
+                .setRequired(true)
+            )
+        ),
+      registerSwitch({
+        development: {
+          guildIds: ['906631270048624661'],
+          idHints: ['1029605428461568051'],
+        },
+        production: { idHints: ['1029606444305223681'] },
+      })
     );
   }
 
