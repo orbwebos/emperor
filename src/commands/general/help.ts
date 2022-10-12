@@ -71,10 +71,7 @@ export class HelpCommand extends Command {
   public getHelpText(): string {
     let help = '';
 
-    const sorted = this.sortCommands(
-      this.container.stores.get('commands'),
-      'General'
-    );
+    const sorted = this.sortCommands(this.store as CommandStore, 'General');
 
     sorted.forEach((col) => {
       help += `\n**${this.snakeToSentence(col.first().category)}\n**`;
