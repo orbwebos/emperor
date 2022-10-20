@@ -9,7 +9,11 @@ import { envSwitch } from './lib/util';
 const { config } = injectIntoContainer();
 
 const client = new SapphireClient({
-  defaultPrefix: '.',
+  defaultPrefix: envSwitch({
+    development: '[',
+    testing: ']',
+    production: '.',
+  }),
   loadMessageCommandListeners: true,
   intents: [
     'GUILDS',
