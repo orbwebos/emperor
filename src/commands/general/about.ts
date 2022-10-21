@@ -23,7 +23,7 @@ function milisecondsToDhms(time: number) {
 @ApplyOptions<Command.Options>({
   description: 'Displays information about the bot.',
 })
-export class UserCommand extends Command {
+export class AboutCommand extends Command {
   public async messageRun(message: Message) {
     const { config } = this.container;
 
