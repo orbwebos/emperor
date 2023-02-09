@@ -1,7 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { container, Listener } from '@sapphire/framework';
 import { Message } from 'discord.js';
-import { getRepliedMessage } from '../lib/content';
 
 const { config } = container;
 
@@ -26,12 +25,14 @@ export class EmojiReactionAction extends Listener {
       return;
     }
 
+    const { channel } = message;
+
     // eslint-disable-next-line no-restricted-syntax
     for (const emoji of config.general.emojiReactionResolvables) {
       // eslint-disable-next-line no-await-in-loop
-      await (await getRepliedMessage(message)).react(emoji);
+      await channel.messages.react(message.reference.messageId, emoji);
       // eslint-disable-next-line no-await-in-loop
-      await message.react(emoji);
+      await channel.messages.react(message.id, emoji);
     }
   }
 }
