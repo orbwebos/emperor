@@ -2,8 +2,10 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { ApplicationCommandRegistry, Command } from '@sapphire/framework';
 import { Message } from 'discord.js';
 import { registerSwitch } from '../../lib/util';
+import { variants } from '../../lib/variants';
 
 @ApplyOptions<Command.Options>({
+  aliases: variants('refresh emoji service'),
   description:
     'Refreshes the emoji cache. It automatically happens every 30 minutes.',
   preconditions: ['OwnerExclusive'],

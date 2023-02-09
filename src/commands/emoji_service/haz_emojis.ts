@@ -4,8 +4,10 @@ import { Message } from 'discord.js';
 import { isInEmojiBlacklist } from '../../lib/emoji_blacklist';
 import { invisibleOption } from '../../lib/invisible_option';
 import { registerSwitch } from '../../lib/util';
+import { variants } from '../../lib/variants';
 
 @ApplyOptions<Command.Options>({
+  aliases: variants('haz emojis', 'has emojis'),
   description: 'Tells you if you haz emojis.',
 })
 export class HazEmojisCommand extends Command {

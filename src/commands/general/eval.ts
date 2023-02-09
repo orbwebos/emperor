@@ -5,6 +5,7 @@ import { Message } from 'discord.js';
 import { inspect } from 'util';
 
 @ApplyOptions<Command.Options>({
+  aliases: ['evaluate'],
   description: 'Evaluates JavaScript code. Owner-exclusive.',
   preconditions: ['OwnerExclusive'],
 })

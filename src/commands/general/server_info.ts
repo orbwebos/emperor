@@ -4,8 +4,10 @@ import { Guild, Message } from 'discord.js';
 import { CommandHelper } from '../../lib/command_helper';
 import { invisibleOption } from '../../lib/invisible_option';
 import { registerSwitch } from '../../lib/util';
+import { variants } from '../../lib/variants';
 
 @ApplyOptions<Command.Options>({
+  aliases: variants('server information', 'server info', 'srv info'),
   description: 'Display information about this server.',
 })
 export class ServerInfoCommand extends Command {

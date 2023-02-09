@@ -4,8 +4,10 @@ import { GuildMember, Message } from 'discord.js';
 import { CommandHelper } from '../../lib/command_helper';
 import { invisibleOption } from '../../lib/invisible_option';
 import { registerSwitch } from '../../lib/util';
+import { variants } from '../../lib/variants';
 
 @ApplyOptions<Command.Options>({
+  aliases: variants('user information', 'user info', 'usr info'),
   description: 'Display information about yourself.',
 })
 export class UserInfoCommand extends Command {

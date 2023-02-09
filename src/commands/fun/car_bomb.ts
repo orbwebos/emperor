@@ -4,8 +4,10 @@ import { addHours } from 'date-fns';
 import { Message } from 'discord.js';
 import { CommandHelper } from '../../lib/command_helper';
 import { getRepliedMessage } from '../../lib/content';
+import { variants } from '../../lib/variants';
 
 @ApplyOptions<Command.Options>({
+  aliases: variants('car bomb'),
   description: 'Plants a car bomb in a message of your choosing.',
   preconditions: ['MustBeReply'],
 })

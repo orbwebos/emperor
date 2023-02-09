@@ -5,8 +5,16 @@ import { CommandHelper } from '../../lib/command_helper';
 import { getProvidedText } from '../../lib/content';
 import { invisibleOption } from '../../lib/invisible_option';
 import { registerSwitch, truncateString } from '../../lib/util';
+import { variants } from '../../lib/variants';
 
 @ApplyOptions<Command.Options>({
+  aliases: variants(
+    '8 ball',
+    'eight ball',
+    'bola ocho',
+    'magic ball',
+    'bola magica'
+  ),
   description: 'Divine your luck.',
 })
 export class EightBallCommand extends Command {

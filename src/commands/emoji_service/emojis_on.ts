@@ -5,8 +5,10 @@ import {
   isInEmojiBlacklist,
   removeFromEmojiBlacklist,
 } from '../../lib/emoji_blacklist';
+import { variants } from '../../lib/variants';
 
 @ApplyOptions<Command.Options>({
+  aliases: variants('emojis on'),
   description: `Opts you into ${container.config.bot.possessiveName} emoji service.`,
 })
 export class EmojisOnCommand extends Command {
