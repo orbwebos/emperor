@@ -1,5 +1,5 @@
 import { container } from '@sapphire/framework';
-import { ColorResolvable, MessageEmbed } from 'discord.js';
+import { ColorResolvable, EmbedBuilder } from 'discord.js';
 
 export interface BrandedEmbedOptions {
   title: string;
@@ -10,8 +10,8 @@ export interface BrandedEmbedOptions {
 }
 
 export class BrandedEmbed {
-  public construct(options: BrandedEmbedOptions): MessageEmbed {
-    return new MessageEmbed()
+  public construct(options: BrandedEmbedOptions): EmbedBuilder {
+    return new EmbedBuilder()
       .setColor(options.color ?? '#7850bd')
       .setTitle(options.title)
       .setAuthor({

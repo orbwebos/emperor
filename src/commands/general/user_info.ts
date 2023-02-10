@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { ApplicationCommandRegistry, Command } from '@sapphire/framework';
-import { GuildMember, Message } from 'discord.js';
+import { GuildMember, Message, ApplicationCommandType } from 'discord.js';
 import { CommandHelper } from '../../lib/command_helper';
 import { invisibleOption } from '../../lib/invisible_option';
 import { registerSwitch } from '../../lib/util';
@@ -27,10 +27,10 @@ export class UserInfoCommand extends Command {
     );
 
     registry.registerContextMenuCommand(
-      {
-        name: 'User Information',
-        type: 'USER',
-      },
+      (builder) =>
+        builder
+          .setName('User Information')
+          .setType(ApplicationCommandType.User),
       registerSwitch({
         development: {
           guildIds: ['906631270048624661'],
@@ -45,7 +45,7 @@ export class UserInfoCommand extends Command {
     return `**Your username:** ${username}\n**Your ID:** ${id}`;
   }
 
-  public chatInputRun(interaction: Command.ChatInputInteraction) {
+  public chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const helper = new CommandHelper(interaction, this);
 
     return interaction.reply({
@@ -60,9 +60,9 @@ export class UserInfoCommand extends Command {
 
   // TODO: remove this somehow. look at best solution
   // eslint-disable-next-line consistent-return
-  public contextMenuRun(interaction: Command.ContextMenuInteraction) {
+  public contextMenuRun(interaction: Command.ContextMenuCommandInteraction) {
     if (
-      interaction.isUserContextMenu() &&
+      interaction.isUserContextMenuCommand() &&
       interaction.targetMember instanceof GuildMember
     ) {
       const helper = new CommandHelper(interaction, this);

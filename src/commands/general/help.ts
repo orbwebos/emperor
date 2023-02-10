@@ -88,7 +88,7 @@ export class HelpCommand extends Command {
     return help;
   }
 
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const helper = new CommandHelper(interaction, this);
 
     return interaction.reply({

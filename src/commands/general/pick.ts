@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args, Command } from '@sapphire/framework';
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
   description: 'Makes a choice between multiple options.',
@@ -19,7 +19,7 @@ export class PickCommand extends Command {
       return message.reply('You must provide at least one option');
     }
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setTitle(choices[Math.floor(Math.random() * choices.length)])
       .setDescription(
         `The above was picked from the following choices: \`${choices.join(

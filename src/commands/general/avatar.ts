@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { ApplicationCommandRegistry, Command } from '@sapphire/framework';
-import { GuildMember } from 'discord.js';
+import { ApplicationCommandType, GuildMember } from 'discord.js';
 import { registerSwitch } from '../../lib/util';
 
 @ApplyOptions<Command.Options>({
@@ -28,10 +28,8 @@ export class AvatarCommand extends Command {
     );
 
     registry.registerContextMenuCommand(
-      {
-        name: 'Guild avatar',
-        type: 'USER',
-      },
+      (builder) =>
+        builder.setName('Guild avatar').setType(ApplicationCommandType.User),
       registerSwitch({
         development: {
           guildIds: ['906631270048624661'],
@@ -42,7 +40,7 @@ export class AvatarCommand extends Command {
     );
   }
 
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const user = interaction.options.getUser('target');
 
     if (user) {
@@ -62,9 +60,11 @@ export class AvatarCommand extends Command {
 
   // TODO: remove this somehow. look at best solution
   // eslint-disable-next-line consistent-return
-  public async contextMenuRun(interaction: Command.ContextMenuInteraction) {
+  public async contextMenuRun(
+    interaction: Command.ContextMenuCommandInteraction
+  ) {
     if (
-      interaction.isUserContextMenu() &&
+      interaction.isUserContextMenuCommand() &&
       interaction.targetMember instanceof GuildMember
     ) {
       return interaction.reply(

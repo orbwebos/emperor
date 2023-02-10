@@ -1,9 +1,9 @@
 import { Command, container } from '@sapphire/framework';
 import {
   ColorResolvable,
-  CommandInteraction,
   Message,
-  MessageEmbed,
+  EmbedBuilder,
+  ChatInputCommandInteraction,
 } from 'discord.js';
 import { isNullOrUndefined } from 'util';
 import { TitleHelper } from './title';
@@ -23,14 +23,14 @@ export class CommandHelper {
   public userName: string;
   public userAvatarUrl: string;
   public readonly apiObject:
-    | Command.ChatInputInteraction
-    | Command.ContextMenuInteraction
+    | Command.ChatInputCommandInteraction
+    | Command.ContextMenuCommandInteraction
     | Message;
 
   public constructor(
     apiObject:
-      | Command.ChatInputInteraction
-      | Command.ContextMenuInteraction
+      | Command.ChatInputCommandInteraction
+      | Command.ContextMenuCommandInteraction
       | Message,
     command?: Command
   ) {
@@ -47,7 +47,7 @@ export class CommandHelper {
   }
 
   public isInvisible() {
-    if (!(this.apiObject instanceof CommandInteraction)) {
+    if (!(this.apiObject instanceof ChatInputCommandInteraction)) {
       return null;
     }
 
@@ -62,7 +62,7 @@ export class CommandHelper {
     const isNullOrUndefinedOrTrue = (o: boolean) =>
       isNullOrUndefined(o) || o === true;
 
-    const embed = new MessageEmbed().setColor(overrides?.color ?? '#7850bd');
+    const embed = new EmbedBuilder().setColor(overrides?.color ?? '#7850bd');
 
     if (!isNullOrUndefined(title)) {
       embed.setTitle(title);

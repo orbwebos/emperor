@@ -25,7 +25,7 @@ export class RefreshEmojiCacheCommand extends Command {
     );
   }
 
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     await this.container.emojiManager.refresh();
 
     return interaction.reply('The emoji cache has been refreshed.');

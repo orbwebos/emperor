@@ -27,7 +27,7 @@ export class HazEmojisCommand extends Command {
     );
   }
 
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     return interaction.reply({
       content: await this.responseText(interaction.user.id),
       ephemeral: Boolean(interaction.options.getBoolean('invisible')),

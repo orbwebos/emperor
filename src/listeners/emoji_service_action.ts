@@ -99,10 +99,10 @@ export class EmojiServiceAction extends Listener {
           this.container.logger.debug(
             `Creating new ${config.bot.name} Emoji Service webhook in ${channel.id}...`
           );
-          webhook = await channel.createWebhook(
-            `${config.bot.name} Emoji Service`,
-            config.general.emojiServiceWebhookAvatarUrl
-          );
+          webhook = await channel.createWebhook({
+            name: `${config.bot.name} Emoji Service`,
+            avatar: config.general.emojiServiceWebhookAvatarUrl,
+          });
         }
 
         try {

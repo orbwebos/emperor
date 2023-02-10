@@ -27,7 +27,7 @@ export class PingCommand extends Command {
     );
   }
 
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const helper = new CommandHelper(interaction, this);
 
     const msg = await interaction.reply({
@@ -38,13 +38,11 @@ export class PingCommand extends Command {
       ],
       fetchReply: true,
     });
-    const createdTime =
-      msg instanceof Message ? msg.createdTimestamp : Date.parse(msg.timestamp);
 
     const content =
       `**Websocket heartbeat:** \`${this.container.client.ws.ping}\`ms\n` +
       `**Roundtrip latency**: \`${
-        createdTime - interaction.createdTimestamp
+        msg.createdTimestamp - interaction.createdTimestamp
       }\`ms`;
 
     return interaction.editReply({

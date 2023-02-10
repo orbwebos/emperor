@@ -84,7 +84,7 @@ export class EightBallCommand extends Command {
     );
   }
 
-  public chatInputRun(interaction: Command.ChatInputInteraction) {
+  public chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const question = this.sanitizeQuestion(
       interaction.options.getString('question')
     );

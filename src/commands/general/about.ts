@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 
 function milisecondsToDhms(time: number) {
   const days = Math.floor(time / (1000 * 60 * 60 * 24));
@@ -30,7 +30,7 @@ export class AboutCommand extends Command {
     const guilds = this.container.client.guilds.cache.size;
     const formattedUptime = milisecondsToDhms(this.container.client.uptime);
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor('#7850bd')
       .setThumbnail(this.container.client.user.displayAvatarURL())
       .setTitle(`About ${config.bot.name}`)

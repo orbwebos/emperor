@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
-import { Message, MessageAttachment } from 'discord.js';
+import { Message, Attachment, Collection } from 'discord.js';
 import { decode, Frame, GIF, Image } from 'imagescript';
 import { basename, extname } from 'path';
 import sizeOf from 'image-size';
@@ -33,7 +33,7 @@ interface ImageInfo {
 })
 export class GifCommand extends Command {
   private async processUrlOrAttachmentAndMessage(
-    urlOrAttachment: MessageAttachment | string,
+    urlOrAttachment: Attachment | string,
     message: Message
   ) {
     let info: ImageInfo;
@@ -44,7 +44,7 @@ export class GifCommand extends Command {
       this.container.logger.debug(error);
       return message.reply(
         `That doesn't seem to be a valid image. File URL: ${
-          urlOrAttachment instanceof MessageAttachment
+          urlOrAttachment instanceof Attachment
             ? urlOrAttachment.url
             : urlOrAttachment
         }`
@@ -73,9 +73,9 @@ export class GifCommand extends Command {
   }
 
   private async urlOrAttachmentInfo(
-    url: MessageAttachment | string
+    url: Attachment | string
   ): Promise<ImageInfo> {
-    if (url instanceof MessageAttachment) {
+    if (url instanceof Attachment) {
       const resp = await fetch(url.url);
       const buf = Buffer.from(await resp.arrayBuffer());
 
@@ -131,11 +131,14 @@ export class GifCommand extends Command {
       return this.processUrlOrAttachmentAndMessage(matches[0], message);
     }
 
-    // of the previous 50 messages sent to the channel,
+    // of the previous 50 messages sent to the channel...
+    const fetched: Collection<
+      string,
+      Message<boolean>
+    > = await message.channel.messages.fetch({ before: message.id, limit: 50 });
+
     // find the first one with an image attachment as its first attachment
-    const msg = (
-      await message.channel.messages.fetch({ before: message.id, limit: 50 })
-    ).find(
+    const msg = fetched.find(
       (m) =>
         m.attachments.size > 0 &&
         (m.attachments.first().contentType === 'image/jpeg' ||

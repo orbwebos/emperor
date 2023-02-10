@@ -26,7 +26,7 @@ export class OnlineCommand extends Command {
     );
   }
 
-  public chatInputRun(interaction: Command.ChatInputInteraction) {
+  public chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     return interaction.reply({
       content: 'Emperor is online, receiving messages and replying properly.',
       ephemeral: Boolean(interaction.options.getBoolean('invisible')),

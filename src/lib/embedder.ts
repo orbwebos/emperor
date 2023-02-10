@@ -1,4 +1,4 @@
-import { ColorResolvable, User, MessageEmbed } from 'discord.js';
+import { ColorResolvable, User, EmbedBuilder } from 'discord.js';
 import { ConfigManager } from './config_manager';
 
 const config = new ConfigManager();
@@ -23,10 +23,10 @@ export class Embedder {
     this.userAvatarUrl = avatarUser || (user as User).displayAvatarURL();
   }
 
-  public embed(options: EmbedOptions): MessageEmbed {
+  public embed(options: EmbedOptions): EmbedBuilder {
     const color = options.color ?? '#7850bd';
 
-    let embed = new MessageEmbed()
+    let embed = new EmbedBuilder()
       .setColor(color)
       .setAuthor({
         name: !this.username.endsWith('#0000')

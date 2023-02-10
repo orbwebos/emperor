@@ -16,12 +16,12 @@ const client = new SapphireClient({
   }),
   loadMessageCommandListeners: true,
   intents: [
-    'GUILDS',
-    'MESSAGE_CONTENT',
-    'GUILD_MESSAGES',
-    'GUILD_MESSAGE_REACTIONS',
-    'GUILD_VOICE_STATES',
-    'DIRECT_MESSAGES',
+    'Guilds',
+    'MessageContent',
+    'GuildMessages',
+    'GuildMessageReactions',
+    'GuildVoiceStates',
+    'DirectMessages',
   ],
   logger: envSwitch<ClientLoggerOptions>({
     development: { level: LogLevel.Debug },

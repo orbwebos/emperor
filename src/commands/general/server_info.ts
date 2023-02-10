@@ -37,7 +37,7 @@ export class ServerInfoCommand extends Command {
     );
   }
 
-  public chatInputRun(interaction: Command.ChatInputInteraction) {
+  public chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const helper = new CommandHelper(interaction, this);
 
     return interaction.reply({

@@ -1,7 +1,7 @@
 import { AllFlowsPrecondition } from '@sapphire/framework';
 import {
   CommandInteraction,
-  ContextMenuInteraction,
+  ContextMenuCommandInteraction,
   Message,
 } from 'discord.js';
 
@@ -12,7 +12,7 @@ export class OwnerExclusivePrecondition extends AllFlowsPrecondition {
     return this.checkIfOwner(interaction.user.id);
   }
 
-  public override contextMenuRun(interaction: ContextMenuInteraction) {
+  public override contextMenuRun(interaction: ContextMenuCommandInteraction) {
     return this.checkIfOwner(interaction.user.id);
   }
 
