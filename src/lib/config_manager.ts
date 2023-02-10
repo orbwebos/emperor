@@ -9,7 +9,7 @@ export class ConfigManager {
   public readonly secrets: ClientSecrets;
   public bot: any;
   public general: any;
-  public wordFilterConfig: any;
+  public fun: any;
 
   public constructor() {
     this.bot = {};
@@ -37,12 +37,12 @@ export class ConfigManager {
           this.general = general;
           break;
         }
-        case 'custom.word_filter': {
-          const wordFilterConf = {};
+        case 'custom.fun': {
+          const fun = {};
           Object.entries(value).forEach(([key2, value2]) => {
-            wordFilterConf[snakeCaseToCamelCase(key2)] = value2;
+            fun[snakeCaseToCamelCase(key2)] = value2;
           });
-          this.wordFilterConfig = wordFilterConf;
+          this.fun = fun;
           break;
         }
         case 'name_possessive':
@@ -52,9 +52,5 @@ export class ConfigManager {
           this.bot[snakeCaseToCamelCase(key)] = value;
       }
     });
-  }
-
-  public wordFilter() {
-    return this.wordFilterConfig;
   }
 }

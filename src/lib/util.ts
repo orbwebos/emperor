@@ -36,6 +36,10 @@ export function resolvePathFromSource(inputPath: string): string {
   return join(__dirname, '..', inputPath);
 }
 
+export function includesAll(input: string, ...values: string[]) {
+  return values.every((s) => input.includes(s));
+}
+
 export function includesAny(input: string, ...values: string[]) {
   return values.some((s) => input.includes(s));
 }
