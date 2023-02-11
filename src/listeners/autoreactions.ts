@@ -1,19 +1,26 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { container, Listener } from '@sapphire/framework';
-import { EmojiResolvable, Message, MessageManager } from 'discord.js';
+import { Listener } from '@sapphire/framework';
+import {
+  EmojiResolvable,
+  Message,
+  MessageManager,
+  TextBasedChannel,
+} from 'discord.js';
 import { getRepliedMessage } from '../lib/content';
 import { includesAll, includesAny, isAnyOf } from '../lib/util';
 
-const { config } = container;
-
 enum ReactionUnitType {
   Emoji = 'EmojiReaction',
+  Send = 'SendReaction',
   Reply = 'ReplyReaction',
 }
 
 enum ReactionUnitStrategy {
   IncludesAny = 'IncludesAny',
   IncludesAll = 'IncludesAll',
+  IsEntireMessage = 'IsEntireMessage',
+  IsAtStart = 'IsAtStart',
+  IsAtEnd = 'IsAtEnd',
   RegexTest = 'RegexTest',
 }
 
@@ -28,6 +35,15 @@ interface EmojiReactionUnit {
   guildsWhitelist: string[];
 }
 
+interface SendReactionUnit {
+  type: ReactionUnitType.Send;
+  strategy: ReactionUnitStrategy;
+  triggers: (string | RegExp)[];
+  qualifications: string[];
+  message: string;
+  guildsWhitelist: string[];
+}
+
 interface ReplyReactionUnit {
   type: ReactionUnitType.Reply;
   strategy: ReactionUnitStrategy;
@@ -39,18 +55,17 @@ interface ReplyReactionUnit {
   guildsWhitelist: string[];
 }
 
-type ReactionUnit = EmojiReactionUnit | ReplyReactionUnit;
+type ReactionUnit = EmojiReactionUnit | SendReactionUnit | ReplyReactionUnit;
 
 @ApplyOptions<Listener.Options>({
   event: 'messageCreate',
 })
 export class AutoreactionsAction extends Listener {
   private triggered() {
-    return config.general.autoreactions === true;
+    return this.container.config.general.autoreactions === true;
   }
 
-  // this should actually be done only once in the ConfigManager!
-  private rawJsonToUnits(jsonArray: any): ReactionUnit[] {
+  public static rawJsonToUnits(jsonArray: any): ReactionUnit[] {
     const units: ReactionUnit[] = [];
 
     // eslint-disable-next-line no-restricted-syntax
@@ -69,6 +84,15 @@ export class AutoreactionsAction extends Listener {
           operateOnTriggered: rawUnit.operate_on_triggered,
           operateOnReferenced: rawUnit.operate_on_referenced,
           emojiResolvables: rawUnit.emoji_resolvables,
+          guildsWhitelist: rawUnit.guilds_whitelist,
+        });
+      } else if (rawUnit.type === ReactionUnitType.Send) {
+        units.push({
+          type: rawUnit.type,
+          strategy: rawUnit.strategy,
+          triggers,
+          qualifications: rawUnit.qualifications,
+          message: rawUnit.message,
           guildsWhitelist: rawUnit.guilds_whitelist,
         });
       } else {
@@ -95,6 +119,7 @@ export class AutoreactionsAction extends Listener {
     if (!isAnyOf(message.guildId, ...unit.guildsWhitelist)) {
       return false;
     }
+
     if (
       isAnyOf('IsReply', ...unit.qualifications) &&
       message.reference === null
@@ -122,6 +147,27 @@ export class AutoreactionsAction extends Listener {
     }
 
     if (
+      unit.strategy === ReactionUnitStrategy.IsEntireMessage &&
+      isAnyOf(content, ...(unit.triggers as string[]))
+    ) {
+      return true;
+    }
+
+    if (
+      unit.strategy === ReactionUnitStrategy.IsAtStart &&
+      (unit.triggers as string[]).some((t) => content.startsWith(t))
+    ) {
+      return true;
+    }
+
+    if (
+      unit.strategy === ReactionUnitStrategy.IsAtEnd &&
+      (unit.triggers as string[]).some((t) => content.endsWith(t))
+    ) {
+      return true;
+    }
+
+    if (
       unit.strategy === ReactionUnitStrategy.RegexTest &&
       (unit.triggers as RegExp[]).some((t) => t.test(content))
     ) {
@@ -136,13 +182,6 @@ export class AutoreactionsAction extends Listener {
     manager: MessageManager,
     message: Message
   ) {
-    if (
-      !this.reactionUnitConditionsFulfilled(unit, message) ||
-      !this.reactionUnitTriggerMatched(unit, message)
-    ) {
-      return;
-    }
-
     if (unit.operateOnReferenced) {
       // eslint-disable-next-line no-restricted-syntax
       for (const emoji of unit.emojiResolvables) {
@@ -160,22 +199,23 @@ export class AutoreactionsAction extends Listener {
     }
   }
 
-  // remove this after implementing it
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async handleReplyUnit(unit: ReplyReactionUnit, message: Message) {
-    if (
-      !this.reactionUnitConditionsFulfilled(unit, message) ||
-      !this.reactionUnitTriggerMatched(unit, message)
-    ) {
-      return;
-    }
+  private async handleSendUnit(
+    unit: SendReactionUnit,
+    channel: TextBasedChannel
+  ) {
+    channel.send({ content: unit.message, allowedMentions: { parse: [] } });
+  }
 
+  private async handleReplyUnit(unit: ReplyReactionUnit, message: Message) {
     if (unit.operateOnReferenced) {
-      (await getRepliedMessage(message)).reply(unit.reply);
+      (await getRepliedMessage(message)).reply({
+        content: unit.reply,
+        allowedMentions: { parse: [] },
+      });
     }
 
     if (unit.operateOnTriggered) {
-      message.reply(unit.reply);
+      message.reply({ content: unit.reply, allowedMentions: { parse: [] } });
     }
   }
 
@@ -185,15 +225,22 @@ export class AutoreactionsAction extends Listener {
     }
 
     const { channel } = message;
+    const { reactionUnits } = this.container.config.general;
 
-    const units = this.rawJsonToUnits(config.general.reactionUnits);
+    const logErr = (error: unknown) => this.container.logger.error(error);
 
-    // tomorrow: see what to do with the promises
-    units.forEach((unit) => {
-      if (unit.type === ReactionUnitType.Emoji) {
-        this.handleEmojiUnit(unit, channel.messages, message);
-      } else {
-        this.handleReplyUnit(unit, message);
+    reactionUnits.forEach((unit) => {
+      if (
+        this.reactionUnitConditionsFulfilled(unit, message) &&
+        this.reactionUnitTriggerMatched(unit, message)
+      ) {
+        if (unit.type === ReactionUnitType.Emoji) {
+          this.handleEmojiUnit(unit, channel.messages, message).catch(logErr);
+        } else if (unit.type === ReactionUnitType.Send) {
+          this.handleSendUnit(unit, channel).catch(logErr);
+        } else {
+          this.handleReplyUnit(unit, message).catch(logErr);
+        }
       }
     });
   }

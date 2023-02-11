@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import { AutoreactionsAction } from '../listeners/autoreactions';
 import { envSwitch, resolvePathFromSource, snakeCaseToCamelCase } from './util';
 
 export interface ClientSecrets {
@@ -32,7 +33,11 @@ export class ConfigManager {
         case 'custom.general': {
           const general = {};
           Object.entries(value).forEach(([key2, value2]) => {
-            general[snakeCaseToCamelCase(key2)] = value2;
+            let val = value2;
+            if (key2 === 'reaction_units') {
+              val = AutoreactionsAction.rawJsonToUnits(value2);
+            }
+            general[snakeCaseToCamelCase(key2)] = val;
           });
           this.general = general;
           break;
