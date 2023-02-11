@@ -45,21 +45,6 @@ export class AboutCommand extends Command {
           name: 'Uptime',
           value: formattedUptime,
           inline: true,
-        },
-        {
-          name: 'Library',
-          value: '[discord.js](https://discord.js.org)',
-          inline: true,
-        },
-        {
-          name: 'Source code',
-          value: '[GitHub](https://github.com/orbwebos/emperor)',
-          inline: true,
-        },
-        {
-          name: 'License',
-          value: '[MIT](https://spdx.org/licenses/MIT.html)',
-          inline: true,
         }
       );
 
