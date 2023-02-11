@@ -1,6 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args, Command } from '@sapphire/framework';
-import { Message, EmbedBuilder } from 'discord.js';
+import { Message } from 'discord.js';
+import { CommandHelper } from '../../lib/command_helper';
 
 @ApplyOptions<Command.Options>({
   description: 'Makes a choice between multiple options.',
@@ -14,24 +15,22 @@ export class PickCommand extends Command {
   public async messageRun(message: Message, args: Args) {
     const options = await args.rest('string');
     const choices = this.parseChoices(options);
+    const helper = new CommandHelper(message, this);
 
-    if (choices.length === 0) {
-      return message.reply('You must provide at least one option');
+    if (choices.length < 2) {
+      return message.reply('You must provide at least two option.');
     }
 
-    const embed = new EmbedBuilder()
-      .setTitle(choices[Math.floor(Math.random() * choices.length)])
-      .setDescription(
-        `The above was picked from the following choices: \`${choices.join(
-          '`, `'
-        )}\``
-      )
-      .setColor(this.container.config.bot.defaultColor)
-      .setFooter({
-        text: `Requested by ${message.author.tag}`,
-        iconURL: message.author.displayAvatarURL(),
-      });
+    const choice = choices[Math.floor(Math.random() * choices.length)];
 
-    return message.reply({ embeds: [embed] });
+    return message.reply({
+      embeds: [
+        helper.makeResponseEmbed(
+          `Emperor has chosen **${choice}** from the following ${
+            choices.length
+          } options: \`${choices.join('`, `')}\``
+        ),
+      ],
+    });
   }
 }
