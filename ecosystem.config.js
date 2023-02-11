@@ -1,10 +1,13 @@
 module.exports = {
-  apps: [{
-    name: 'Emperor',
-    script: './dist/index.js',
-    watch: './dist',
-    node_args: '-r dotenv/config',
-  }],
+  apps: [
+    {
+      name: 'Emperor',
+      script: './dist/index.js',
+      watch: './dist',
+      node_args: '-r dotenv/config',
+      env: { NODE_ENV: 'production' },
+    },
+  ],
 
   deploy: {
     production: {
@@ -14,7 +17,8 @@ module.exports = {
       repo: 'GIT_REPOSITORY',
       path: 'DESTINATION_PATH',
       'pre-deploy-local': '',
-      'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env production',
+      'post-deploy':
+        'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
     },
   },
