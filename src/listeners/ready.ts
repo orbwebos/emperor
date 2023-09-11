@@ -1,15 +1,15 @@
-import * as schedule from 'node-schedule';
 import { Listener } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
+import { scheduleJob } from 'node-schedule';
 
 @ApplyOptions<Listener.Options>({ once: true })
-export class ReadyListener extends Listener {
+export class UserListener extends Listener {
   public async run() {
-    this.container.emojiManager.setup();
+    this.container.emojiCache.setup();
     this.container.logger.debug('The emoji cache has been built.');
 
-    schedule.scheduleJob('*/30 * * * *', async () => {
-      await this.container.emojiManager.refresh();
+    scheduleJob('*/30 * * * *', async () => {
+      await this.container.emojiCache.refresh();
       this.container.logger.debug('The emoji cache has been refreshed.');
     });
   }

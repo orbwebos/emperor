@@ -1,33 +1,13 @@
-import {
-  ClientLoggerOptions,
-  LogLevel,
-  SapphireClient,
-} from '@sapphire/framework';
-import { injectIntoContainer } from './lib/container';
-import { envSwitch } from './lib/util';
+import { container } from '@sapphire/framework';
+import { injectIntoContainer, setupMusicManager } from './lib/container';
+import '@sapphire/plugin-editable-commands/register';
+import { EmperorClient } from './lib/EmperorClient';
 
 const { config } = injectIntoContainer();
 
-const client = new SapphireClient({
-  defaultPrefix: envSwitch({
-    development: '[',
-    testing: ']',
-    production: '.',
-  }),
-  loadMessageCommandListeners: true,
-  intents: [
-    'Guilds',
-    'MessageContent',
-    'GuildMessages',
-    'GuildMessageReactions',
-    'GuildVoiceStates',
-    'DirectMessages',
-  ],
-  logger: envSwitch<ClientLoggerOptions>({
-    development: { level: LogLevel.Debug },
-    production: { level: LogLevel.Info },
-  }),
-});
+const client = new EmperorClient();
+
+setupMusicManager(client);
 
 process.on('SIGINT', () => {
   client.logger.info('Gracefully shutting down.');
@@ -45,4 +25,4 @@ async function main() {
   }
 }
 
-main();
+main().catch(container.logger.error.bind(container.logger));
