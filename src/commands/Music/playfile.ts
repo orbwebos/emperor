@@ -2,7 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
 import { GuildMember } from 'discord.js';
 import { LoadType } from 'shoukaku';
-import { registerSwitch } from '../../lib/util';
+import { plural, registerSwitch } from '../../lib/util';
 import { editReplyMusicEmbed } from '../../lib/reply';
 import { EmperorTrack } from '../../lib/music/EmperorTrack';
 import { UserNotInVoiceChannelError } from '../../lib/errors';
@@ -115,7 +115,12 @@ export class UserCommand extends Command {
       });
     }
 
+    // adding more than one song through playfile shouldn't be possible; the
+    // discord UI will only let you upload one file, but I included it anyway
+    // for completeness
     music.queueAdd(interaction.guildId, ...tracks);
-    return interaction.editReply('Added to queue.');
+    return interaction.editReply(
+      `Added ${tracks.length} track${plural(tracks)} to queue.`
+    );
   }
 }
