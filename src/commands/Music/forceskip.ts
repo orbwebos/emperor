@@ -32,6 +32,9 @@ export class UserCommand extends Command {
     }
     await player.play({ track: next });
 
-    return silentTrackReplyMusicEmbed(message, { track: next });
+    return silentTrackReplyMusicEmbed(message, {
+      track: next,
+      title: 'Skipped to:',
+    });
   }
 }
