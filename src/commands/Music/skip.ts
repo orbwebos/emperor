@@ -3,7 +3,7 @@ import { Args, Command } from '@sapphire/framework';
 import { Message } from 'discord.js';
 import { registerSwitch } from '../../lib/util';
 import {
-  replyMusicEmbed,
+  editReplyMusicEmbed,
   silentTrackReply,
   silentTrackReplyMusicEmbed,
 } from '../../lib/reply';
@@ -57,11 +57,13 @@ export class UserCommand extends Command {
       });
     }
 
-    return replyMusicEmbed(obj, { track, title: 'Skipped to:' });
+    return editReplyMusicEmbed(obj, { track, title: 'Skipped to:' });
   }
 
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const { music, player } = this.container.getMusic(interaction.guildId);
+
+    await interaction.deferReply();
 
     const amount = interaction.options.getInteger('amount') ?? 1;
     const force = interaction.options.getBoolean('force') ?? false;
@@ -72,10 +74,12 @@ export class UserCommand extends Command {
       force
     );
     if (!success && !force) {
-      return interaction.reply('No tracks were skipped: the queue is empty.');
+      return interaction.editReply(
+        'No tracks were skipped: the queue is empty.'
+      );
     }
     if (!success && force) {
-      return interaction.reply(
+      return interaction.editReply(
         'No tracks were skipped: the queue is empty and no track is playing.'
       );
     }
@@ -83,10 +87,10 @@ export class UserCommand extends Command {
     if (!next) {
       await player.stop();
       if (!skipped.length) {
-        return interaction.reply('There are no tracks to skip.');
+        return interaction.editReply('There are no tracks to skip.');
       }
       const plural = skipped.length === 1 ? '' : 's';
-      return interaction.reply(
+      return interaction.editReply(
         `Forcefully skipped ${skipped.length} track${plural}.`
       );
     }
