@@ -82,6 +82,9 @@ export class UserCommand extends Command {
 
     if (!next) {
       await player.stop();
+      if (!skipped.length) {
+        return interaction.reply('There are no tracks to skip.');
+      }
       const plural = skipped.length === 1 ? '' : 's';
       return interaction.reply(
         `Forcefully skipped ${skipped.length} track${plural}.`
@@ -121,6 +124,9 @@ export class UserCommand extends Command {
 
     if (!next) {
       await player.stop();
+      if (!skipped.length) {
+        return silentTrackReply(message, 'There are no tracks to skip.');
+      }
       const plural = skipped.length === 1 ? '' : 's';
       return silentTrackReply(
         message,

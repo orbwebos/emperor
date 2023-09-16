@@ -21,6 +21,9 @@ export class UserCommand extends Command {
     const { next, skipped } = music.queueSkip(message.guildId, amount, true);
     if (!next) {
       await player.stop();
+      if (!skipped.length) {
+        return silentTrackReply(message, 'There are no tracks to skip.');
+      }
       const plural = skipped.length === 1 ? '' : 's';
       return silentTrackReply(
         message,
