@@ -1,6 +1,6 @@
 {
    "name": "emperor",
-   "version": "5.20.3",
+   "version": "5.20.4",
    "description": "The Emperor Discord bot.",
    "main": "dist/index.js",
    "scripts": {
