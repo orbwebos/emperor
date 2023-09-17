@@ -66,11 +66,9 @@ export function timestampToMs(timestamp: string): number {
 export class MusicManager {
   public lavalink: Shoukaku;
   public queues: Map<string, TrackQueue>;
-  // currentTracks: Map<string, EmperorTrack>;
 
   public constructor() {
     this.queues = new Map();
-    // this.currentTracks = new Map();
   }
 
   /**
@@ -124,14 +122,6 @@ export class MusicManager {
     return from.guild.members.cache.get(from.user.id).voice;
   }
 
-  // public async joinVoiceChannel(options: VoiceChannelOptions): Promise<Player> {
-  //   return this.lavalink.joinVoiceChannel({
-  //     guildId: options.guildId,
-  //     channelId: options.channelId,
-  //     shardId: options.shardId ?? 0,
-  //   });
-  // }
-
   public async player(
     guildId: string,
     channelId: string
@@ -161,8 +151,6 @@ export class MusicManager {
           )
         )
         .on('start', (event: TrackStartEvent) => {
-          // container.logger.debug(typeof event.track);
-          // container.logger.debug(JSON.stringify(event.track));
           container.logger.debug(
             `player: start (${event.guildId}), track: ${event.track.info.title}`
           );
@@ -372,9 +360,6 @@ export class MusicManager {
     player.playTrack({ track: track.encoded });
     [player.lastTrack, player.unencodedTrack] = [player.unencodedTrack, track];
   }
-
-  // public getCurrentTrack(guildId: string): Track {
-  // }
 
   public static mayStartNext(reason: TrackEndReason): boolean {
     switch (reason) {
