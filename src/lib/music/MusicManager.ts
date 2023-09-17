@@ -278,6 +278,8 @@ export class MusicManager {
       return undefined;
     }
 
+    container.logger.debug(`queue mode for ${guildId}: ${queue.mode}`);
+
     return queue.mode;
   }
 
@@ -323,15 +325,13 @@ export class MusicManager {
   }
 
   public onTrackEnd(event: TrackEndEvent): void {
-    container.logger.debug(
-      `player: end (${event.guildId}), track: ${event.track.info.title} [${event.reason}]`
-    );
-
     const playerResult = this.existingPlayer(event.guildId);
     if (playerResult.isNone()) {
       return;
     }
     const player = playerResult.unwrap();
+
+    const trackThatFinished = player.unencodedTrack;
 
     if (event.reason !== 'replaced' && event.reason !== 'stopped') {
       [player.lastTrack, player.track, player.unencodedTrack] = [
@@ -358,10 +358,10 @@ export class MusicManager {
         track = this.queueNext(event.guildId);
         break;
       case RepeatingMode.TRACK:
-        track = player.unencodedTrack;
+        track = trackThatFinished;
         break;
       case RepeatingMode.QUEUE:
-        this.queueAdd(event.guildId, player.unencodedTrack);
+        this.queueAdd(event.guildId, trackThatFinished);
         track = this.queueNext(event.guildId);
     }
 
