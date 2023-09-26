@@ -166,6 +166,13 @@ export class UserCommand extends Command {
       query = queryResult.unwrap();
     }
 
+    if (!query) {
+      return silentTrackReply(
+        message,
+        'You need to provide a query to search or file to play.'
+      );
+    }
+
     const result = await music.search({
       query,
       defaultSourcePrefix: 'ytsearch',
