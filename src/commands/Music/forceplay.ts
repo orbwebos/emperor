@@ -36,6 +36,7 @@ export class UserCommand extends Command {
     }
 
     const result = await music.search({
+      guildId: message.guildId,
       query,
       defaultSourcePrefix: 'ytsearch',
     });

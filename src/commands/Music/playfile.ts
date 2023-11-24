@@ -54,6 +54,7 @@ export class UserCommand extends Command {
     }
 
     const result = await music.search({
+      guildId: interaction.guildId,
       query: interaction.options.getAttachment('track').url,
     });
 

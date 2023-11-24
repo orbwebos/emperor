@@ -1,4 +1,3 @@
-import { isNullOrUndefined } from 'util';
 import { reply, send } from '@sapphire/plugin-editable-commands';
 import {
   APIEmbed,
@@ -16,29 +15,11 @@ import { EmperorTrack } from './music/EmperorTrack';
 import { defaultEmperorEmbed } from './embeds';
 import { CommandObject, userName } from './util';
 import { toTimestamp } from './music/MusicManager';
+import { isNullOrUndefined } from '@sapphire/utilities';
 
 function injectSilentIntoOptions(
-  options: string | MessagePayload | MessageReplyOptions
-): MessagePayload | MessageReplyOptions {
-  if (options instanceof MessagePayload) {
-    const toUse = options;
-    if (!isNullOrUndefined(toUse.options)) {
-      if (!isNullOrUndefined(toUse.options.allowedMentions)) {
-        toUse.options.allowedMentions.repliedUser = false;
-      } else {
-        toUse.options.allowedMentions = {
-          repliedUser: false,
-        };
-      }
-    } else {
-      toUse.options = {
-        allowedMentions: {
-          repliedUser: false,
-        },
-      };
-    }
-    return toUse;
-  }
+  options: string | MessageReplyOptions
+): MessageReplyOptions {
   if (typeof options === 'string') {
     return {
       content: options,
@@ -132,14 +113,14 @@ export function editReplyMusicEmbed(
 
 export function silentReply(
   message: Message,
-  options: string | MessagePayload | MessageReplyOptions
+  options: string | MessageReplyOptions
 ): Promise<Message> {
   return message.reply(injectSilentIntoOptions(options));
 }
 
 export function silentTrackReply(
   message: Message,
-  options: string | MessagePayload | MessageReplyOptions
+  options: string | MessageReplyOptions
 ): Promise<Message> {
   if (
     message.channel instanceof BaseGuildTextChannel ||

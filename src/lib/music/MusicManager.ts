@@ -88,17 +88,22 @@ export class MusicManager {
     }
   }
 
-  public bestNode(): Node {
-    return this.lavalink.getIdealNode();
+  public bestNode(guildId: string): Node {
+    return this.lavalink.options.nodeResolver(
+      this.lavalink.nodes,
+      this.lavalink.connections.get(guildId)
+    );
   }
 
   public async resolveIdentifier(
-    identifier: string
+    identifier: string,
+    guildId: string
   ): Promise<LavalinkResponse> {
-    return this.bestNode().rest.resolve(identifier);
+    return this.bestNode(guildId).rest.resolve(identifier);
   }
 
   public async search(options: {
+    guildId: string;
     query: string;
     defaultSourcePrefix?: string;
     stripComparisonSigns?: boolean;
@@ -110,9 +115,12 @@ export class MusicManager {
       : options.query;
 
     if (isValidUrl(query)) {
-      return this.resolveIdentifier(query);
+      return this.resolveIdentifier(query, options.guildId);
     }
-    return this.resolveIdentifier(`${defaultSourcePrefix}:${query}`);
+    return this.resolveIdentifier(
+      `${defaultSourcePrefix}:${query}`,
+      options.guildId
+    );
   }
 
   public userVoiceState(from: CommandInteraction | Message): VoiceState {

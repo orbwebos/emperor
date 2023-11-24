@@ -58,6 +58,7 @@ export class UserCommand extends Command {
     }
 
     const result = await music.search({
+      guildId: interaction.guildId,
       query: interaction.options.getString('query'),
       defaultSourcePrefix: 'ytsearch',
     });
@@ -174,6 +175,7 @@ export class UserCommand extends Command {
     }
 
     const result = await music.search({
+      guildId: message.guildId,
       query,
       defaultSourcePrefix: 'ytsearch',
     });
