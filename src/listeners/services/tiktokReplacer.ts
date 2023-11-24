@@ -7,10 +7,17 @@ import {
   WebhookMessageCreateOptions,
 } from 'discord.js';
 import { ApplyOptions } from '@sapphire/decorators';
-import { isAnyOf, truncateString } from '../../lib/util';
+import { truncateString } from '../../lib/util';
 import { includesEmojiKey } from './emojiReplacer';
 import { Embedder } from '../../lib/Embedder';
-import { TikTokShortenedUrl, TikTokUrl } from '../../lib/regexes';
+import {
+  TikTokShortenedUrl,
+  TikTokShortenedUrlTesting,
+  TikTokUrl,
+  TikTokUrlTesting,
+  TiktokFallbackHTMLRegex,
+} from '../../lib/regexes';
+import { writeFileSync } from 'fs';
 
 @ApplyOptions<Listener.Options>({ event: Events.MessageCreate })
 export class UserListener extends Listener<typeof Events.MessageCreate> {
@@ -20,12 +27,11 @@ export class UserListener extends Listener<typeof Events.MessageCreate> {
     }
 
     if (
-      !isAnyOf(
-        message.guildId,
+      ![
         '308422022650789888', // sneed clan
         '792960761101942795', // canadian server
-        '948971692804419705' // testing server
-      )
+        '948971692804419705', // testing server
+      ].includes(message.guildId)
     ) {
       return false;
     }
@@ -36,8 +42,8 @@ export class UserListener extends Listener<typeof Events.MessageCreate> {
     }
 
     return (
-      TikTokShortenedUrl.test(message.content) ||
-      TikTokUrl.test(message.content)
+      TikTokShortenedUrlTesting.test(message.content) ||
+      TikTokUrlTesting.test(message.content)
     );
   }
 
@@ -142,6 +148,18 @@ export class UserListener extends Listener<typeof Events.MessageCreate> {
     );
   }
 
+  private extractURLFromHTMLFallback(html: string) {
+    const match = html.match(TiktokFallbackHTMLRegex);
+
+    if (match && match[1]) {
+      // Replace Unicode escapes with regular characters
+      let url = match[1].replace(/\\u002F/g, '/');
+      return decodeURIComponent(url);
+    }
+
+    return null;
+  }
+
   private async expandTikTokUrl(url: string): Promise<string> {
     const html = await (await fetch(url)).text();
     const $ = load(html);
@@ -149,8 +167,14 @@ export class UserListener extends Listener<typeof Events.MessageCreate> {
     const canonicalLinkElement = $('link[rel="canonical"]');
     const expandedUrl = canonicalLinkElement?.attr('href');
 
-    if (TikTokUrl.test(expandedUrl)) {
+    if (TikTokUrlTesting.test(expandedUrl)) {
       return expandedUrl;
+    }
+
+    // fall back in case we don't get the regular HTML
+    const fallback = this.extractURLFromHTMLFallback(html);
+    if (TikTokUrlTesting.test(fallback)) {
+      return fallback;
     }
 
     throw new Error(`couldn't parse html for url ${url}`);
