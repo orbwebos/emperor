@@ -13,38 +13,21 @@ export class UserCommand extends Command {
   public async messageRun(message: Message, args: Args) {
     const code = await args.rest('string');
 
+    let highlighting = 'js';
     const result = await this.eval(message.guildId, code);
+    if (result instanceof Error) {
+      // don't set the highlighting language
+      // as JavaScript when there's been an error
+      highlighting = '';
+    }
 
-    return message.reply(`\`\`\`js\n${result}\`\`\``);
+    return message.reply(`\`\`\`${highlighting}\n${result}\`\`\``);
   }
 
-  private async eval(_guildId: string, code: string): Promise<string> {
+  private async eval(_guildId: string, code: string): Promise<string | Error> {
     let result = null;
 
     try {
-      //       const prelude = `const { container } = require('@sapphire/framework');
-      // const { client } = container;
-
-      // const thisGuild = client.guilds.cache.get('${guildId}')
-
-      // async function getFullMessage(channelId, id) {
-      //   return thisGuild.channels.cache.get(channelId).messages.fetch(id);
-      // }
-
-      // async function getMessage(channelId, id) {
-      //   const message = await getFullMessage(channelId, id);
-      //   return {
-      //     id: message.id,
-      //     author: message.author,
-      //     content: message.content,
-      //     createdAt: message.createdAt,
-      //     editedAt: message.editedAt,
-      //     createdTimestamp: message.createdTimestamp,
-      //     editedTimestamp: message.editedTimestamp,
-      //   }
-      // }`;
-      // eslint-disable-next-line no-eval
-      // result = eval(`${prelude}${code}`);
       // eslint-disable-next-line no-eval
       result = eval(code);
     } catch (error) {
