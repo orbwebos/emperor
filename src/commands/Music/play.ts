@@ -57,11 +57,25 @@ export class UserCommand extends Command {
       throw new UserNotInVoiceChannelError();
     }
 
-    const result = await music.search({
-      guildId: interaction.guildId,
-      query: interaction.options.getString('query'),
-      defaultSourcePrefix: 'ytsearch',
-    });
+    let result;
+    try {
+      result = await music.search({
+        guildId: interaction.guildId,
+        query: interaction.options.getString('query'),
+        defaultSourcePrefix: 'ytsearch',
+      });
+    } catch (e) {
+      if (
+        e.message?.includes("read properties of undefined (reading 'rest')")
+      ) {
+        return interaction.editReply(
+          'The music service appears to be down at the moment, and Emperor is attempting to reconnect. This could take up to several minutes.'
+        );
+      }
+      return interaction.editReply(
+        `There was an error while attempting to search that track:\`\`\`${e.message}\`\`\``
+      );
+    }
 
     let playlistName = '';
     let tracks: EmperorTrack[] = [];
@@ -174,11 +188,27 @@ export class UserCommand extends Command {
       );
     }
 
-    const result = await music.search({
-      guildId: message.guildId,
-      query,
-      defaultSourcePrefix: 'ytsearch',
-    });
+    let result;
+    try {
+      result = await music.search({
+        guildId: message.guildId,
+        query,
+        defaultSourcePrefix: 'ytsearch',
+      });
+    } catch (e) {
+      if (
+        e.message?.includes("read properties of undefined (reading 'rest')")
+      ) {
+        return silentTrackReply(
+          message,
+          'The music service appears to be down at the moment, and Emperor is attempting to reconnect. This could take up to several minutes.'
+        );
+      }
+      return silentTrackReply(
+        message,
+        `There was an error while attempting to search that track:\`\`\`${e.message}\`\`\``
+      );
+    }
 
     let playlistName = '';
     let tracks: EmperorTrack[] = [];
