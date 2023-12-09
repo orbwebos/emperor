@@ -85,11 +85,35 @@ export class MusicManager {
       }
     );
 
+    const { logger } = container;
+
     if (isNullOrUndefined(options.onError)) {
-      this.lavalink.on('error', (_, error) => console.error(error)); // fix this somehow
+      this.lavalink.on('error', (name, error) =>
+        logger.error(error, `Lavalink node: ${name} threw an error`)
+      );
     } else {
       this.lavalink.on('error', options.onError);
     }
+
+    this.lavalink
+      .on('reconnecting', (name, left, timeout) =>
+        logger.warn(
+          `Lavalink node: ${name} is reconnecting. Tries left: ${left} | Timeout: ${timeout}s`
+        )
+      )
+      .on('disconnect', (name, moved) =>
+        logger.warn(`Lavalink node: ${name} is disconnected. Moved: ${moved}`)
+      )
+      .on('error', (name, error) =>
+        logger.error(error, `Lavalink node: ${name} threw an error.`)
+      )
+      .on('debug', (name, message) => {
+        const lowercase = message.toLowerCase();
+        if (lowercase.includes('status update')) {
+          return;
+        }
+        logger.debug(`Lavalink node: ${name} | ${message}`);
+      });
   }
 
   public bestNode(guildId: string): Node {
