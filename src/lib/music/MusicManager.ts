@@ -78,7 +78,11 @@ export class MusicManager {
     this.lavalink = new Shoukaku(
       new Connectors.DiscordJS(options.client),
       options.nodes,
-      { structures: { player: EmperorPlayer } }
+      {
+        reconnectTries: 60,
+        reconnectInterval: 10,
+        structures: { player: EmperorPlayer },
+      }
     );
 
     if (isNullOrUndefined(options.onError)) {
