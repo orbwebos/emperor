@@ -7,3 +7,7 @@ data/
 scripts/
 dist/
 run_db*
+Lavalink.jar
+application.yml
+plugins/
+logs/
