@@ -83,6 +83,9 @@ export class UserCommand extends Command {
       });
     });
 
+    help += `### Erm, where are the music commands?
+They have been temporarily removed in the 5.21.0 release due to long-standing issues. They'll be brought back in the 5.22.0 release.`;
+
     return help;
   }
 
