@@ -1,6 +1,8 @@
 import {
+  ApplicationCommandRegistries,
   ClientLoggerOptions,
   LogLevel,
+  RegisterBehavior,
   SapphireClient,
 } from '@sapphire/framework';
 import { ClientOptions, GuildChannel, PermissionResolvable } from 'discord.js';
@@ -31,6 +33,9 @@ const CLIENT_OPTIONS: ClientOptions = {
 export class EmperorClient extends SapphireClient {
   public constructor() {
     super(CLIENT_OPTIONS);
+    ApplicationCommandRegistries.setDefaultBehaviorWhenNotIdentical(
+      RegisterBehavior.BulkOverwrite
+    );
   }
 
   public hasPermission(
