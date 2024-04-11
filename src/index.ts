@@ -1,13 +1,11 @@
 import { container } from '@sapphire/framework';
-import { injectIntoContainer, setupMusicManager } from './lib/container';
+import { injectIntoContainer } from './lib/container';
 import '@sapphire/plugin-editable-commands/register';
 import { EmperorClient } from './lib/EmperorClient';
 
 const { config } = injectIntoContainer();
 
 const client = new EmperorClient();
-
-setupMusicManager(client);
 
 process.on('SIGINT', () => {
   client.logger.info('Gracefully shutting down.');

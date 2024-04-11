@@ -6,15 +6,11 @@ import {
   Interaction,
   JSONEncodable,
   Message,
-  MessagePayload,
   MessageReplyOptions,
   PermissionsBitField,
   VoiceChannel,
 } from 'discord.js';
-import { EmperorTrack } from './music/EmperorTrack';
-import { defaultEmperorEmbed } from './embeds';
-import { CommandObject, userName } from './util';
-import { toTimestamp } from './music/MusicManager';
+import { CommandObject } from './util';
 import { isNullOrUndefined } from '@sapphire/utilities';
 
 function injectSilentIntoOptions(
@@ -50,65 +46,6 @@ export function editReplyEmbed(
   embed: Embed
 ) {
   return interaction.editReply({ embeds: [embed] });
-}
-
-export interface MusicEmbedOptions {
-  track: EmperorTrack;
-  title?: string;
-  byline?: string;
-  footerOverride?: string;
-}
-
-export function buildMusicEmbed(options: MusicEmbedOptions) {
-  const { track } = options;
-
-  const builder = defaultEmperorEmbed()
-    .setTitle('Now playing')
-    .setDescription(
-      `[${track.info.title}](${track.info.uri})\n**${toTimestamp(
-        track.info.position,
-        track.info.length
-      )}**`
-    )
-    .setThumbnail(track.info.artworkUrl)
-    .setFooter({
-      text: `Requested by ${userName(track.requester.user)}`,
-      iconURL: track.requester.user.displayAvatarURL(),
-    });
-
-  if (options.title) {
-    builder.setTitle(options.title);
-  }
-
-  if (options.byline) {
-    builder.setFooter({
-      text: `${options.byline} ${userName(track.requester.user)}`,
-      iconURL: track.requester.user.displayAvatarURL(),
-    });
-  }
-
-  if (options.footerOverride) {
-    builder.setFooter({
-      text: options.footerOverride,
-      iconURL: track.requester.user.displayAvatarURL(),
-    });
-  }
-
-  return builder;
-}
-
-export function replyMusicEmbed(
-  interaction: InteractionAnswerable,
-  options: MusicEmbedOptions
-) {
-  return interaction.reply({ embeds: [buildMusicEmbed(options)] });
-}
-
-export function editReplyMusicEmbed(
-  interaction: InteractionAnswerable,
-  options: MusicEmbedOptions
-) {
-  return interaction.editReply({ embeds: [buildMusicEmbed(options)] });
 }
 
 export function silentReply(
@@ -151,20 +88,4 @@ export function silentTrackReplyEmbed(
   }
 
   return obj.reply({ embeds: [embed] });
-}
-
-export function silentTrackReplyMusicEmbed(
-  obj: CommandObject,
-  options: MusicEmbedOptions
-) {
-  const builder = buildMusicEmbed(options);
-
-  if (obj instanceof Message) {
-    return reply(obj, {
-      embeds: [builder],
-      allowedMentions: { repliedUser: false },
-    });
-  }
-
-  return obj.reply({ embeds: [builder] });
 }
