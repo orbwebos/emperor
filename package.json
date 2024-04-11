@@ -14,6 +14,7 @@
       "slash": "ts-node -r dotenv/config scripts/slash_update.ts",
       "scratch": "ts-node -r dotenv/config scripts/scratch.ts",
       "format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+      "lint": "eslint . --ext .ts,.tsx",
       "test": "echo \"Error: no test specified\" && exit 1"
    },
    "author": "Orbwebos",
