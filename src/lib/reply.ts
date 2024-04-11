@@ -10,8 +10,8 @@ import {
   PermissionsBitField,
   VoiceChannel,
 } from 'discord.js';
-import { CommandObject } from './util';
 import { isNullOrUndefined } from '@sapphire/utilities';
+import { CommandObject } from './util';
 
 function injectSilentIntoOptions(
   options: string | MessageReplyOptions

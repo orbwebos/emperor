@@ -17,7 +17,6 @@ import {
   TikTokUrlTesting,
   TiktokFallbackHTMLRegex,
 } from '../../lib/regexes';
-import { writeFileSync } from 'fs';
 
 @ApplyOptions<Listener.Options>({ event: Events.MessageCreate })
 export class UserListener extends Listener<typeof Events.MessageCreate> {
@@ -153,7 +152,7 @@ export class UserListener extends Listener<typeof Events.MessageCreate> {
 
     if (match && match[1]) {
       // Replace Unicode escapes with regular characters
-      let url = match[1].replace(/\\u002F/g, '/');
+      const url = match[1].replace(/\\u002F/g, '/');
       return decodeURIComponent(url);
     }
 

@@ -47,7 +47,7 @@ export class UserListener extends Listener<typeof Events.MessageCreate> {
 
     const prefix = (await this.container.client.fetchPrefix(message))[0];
 
-    if (message?.content[0] != prefix) {
+    if (message?.content[0] !== prefix) {
       return false;
     }
 
@@ -60,7 +60,7 @@ export class UserListener extends Listener<typeof Events.MessageCreate> {
     if (!(await this.triggered(message))) {
       return;
     }
-    return silentReply(
+    silentReply(
       message,
       "Music commands have been temporarily removed in the 5.21.0 release due to long-standing issues. They'll be brought back in the 5.22.0 release."
     );
