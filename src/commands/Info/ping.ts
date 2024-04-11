@@ -29,7 +29,7 @@ export class UserCommand extends Command {
     const msg = await interaction.reply({
       embeds: [
         helper.makeProcessingEmbed(
-          '**Websocket heartbeat:** `...`ms\n**Roundtrip latency**: `...`ms'
+          '**Websocket heartbeat:** `...`ms\n**Roundtrip latency:** `...`ms'
         ),
       ],
       fetchReply: true,
@@ -37,7 +37,7 @@ export class UserCommand extends Command {
 
     const content =
       `**Websocket heartbeat:** \`${this.container.client.ws.ping}\`ms\n` +
-      `**Roundtrip latency**: \`${
+      `**Roundtrip latency:** \`${
         msg.createdTimestamp - interaction.createdTimestamp
       }\`ms`;
 
@@ -52,14 +52,14 @@ export class UserCommand extends Command {
     const msg = await message.reply({
       embeds: [
         helper.makeProcessingEmbed(
-          '**Websocket heartbeat:** `...`ms\n**Roundtrip latency**: `...`ms'
+          '**Websocket heartbeat:** `...`ms\n**Roundtrip latency:** `...`ms'
         ),
       ],
     });
 
     const content =
       `**Websocket heartbeat:** \`${this.container.client.ws.ping}\`ms\n` +
-      `**Roundtrip latency**: \`${
+      `**Roundtrip latency:** \`${
         (msg.editedTimestamp || msg.createdTimestamp) -
         (message.editedTimestamp || message.createdTimestamp)
       }\`ms`;
