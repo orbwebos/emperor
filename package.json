@@ -24,6 +24,7 @@
       "@sapphire/discord-utilities": "^3.1.0",
       "@sapphire/framework": "^5.1.0",
       "@sapphire/plugin-editable-commands": "^4.0.2",
+      "@sapphire/plugin-logger": "^4.0.2",
       "@sapphire/plugin-subcommands": "^6.0.3",
       "@sapphire/utilities": "^3.12.0",
       "@types/uuid": "^9.0.7",

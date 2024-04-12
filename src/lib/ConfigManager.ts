@@ -12,6 +12,7 @@ export interface BotInfo {
   version: string;
   ownerIds: string[];
   defaultColor: ColorResolvable;
+  loggingChannelId: string;
 }
 
 export interface MusicNodeConfig {
@@ -34,6 +35,7 @@ export class ConfigManager {
       version: '',
       ownerIds: [],
       defaultColor: '#',
+      loggingChannelId: '',
     };
 
     const mid = envSwitch({
