@@ -79,8 +79,17 @@ export class UserCommand extends Command {
   }
 
   public async messageRun(message: Message, args: Args) {
-    await args.rest('string');
-
+    try {
+      await args.rest('string');
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes('no more arguments.')
+      ) {
+        return reply(message, 'You must ask a question.');
+      }
+      throw error;
+    }
     return reply(message, this.getText());
   }
 }
